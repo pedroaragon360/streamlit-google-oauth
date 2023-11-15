@@ -85,7 +85,7 @@ def main():
 
 
 # Run the app
-if __name__ == "__main__":
+if __name__ == "__main__" and "authed" not in st.session_state:
     main()
 
 
@@ -107,6 +107,10 @@ if "messages" not in st.session_state:
 
 if "retry_error" not in st.session_state:
     st.session_state.retry_error = 0
+
+
+if "authed" not in st.session_state:
+    st.session_state.authed = 1
 
 # Set up the page
 #st.set_page_config(page_title="Asistente")

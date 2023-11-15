@@ -50,7 +50,7 @@ def main():
         # Display login screen
         st.title("Login with Google")
         auth_url, _ = flow.authorization_url(prompt='consent')
-        st.markdown(f'<a href="{auth_url}" target="_blank">Login</a>', unsafe_allow_html=True)
+        st.markdown(f'<a href="{auth_url}">Login</a>', unsafe_allow_html=True)
 
     else:
         # User is authenticated, show the content screen

@@ -85,7 +85,9 @@ def main():
         st.session_state.user_info = userinfo_response.json().get('email', '-')
         checkAuth = authTHV({"user":st.session_state.user_info})
         if checkAuth != "1":
-            st.title("No tienes acceso por The Valley" + checkAuth)
+            st.title("Subscripción no activa")
+            st.write("No tienes acceso actualmente a esta aplicación. \n Si estás cursando un programa en estos momentos, solicita tu alta escribiendo a altagpt@thevalley.es")
+            st.stop()
             
         st.write(f"User info: {st.session_state.user_info}")
         # st.write("")

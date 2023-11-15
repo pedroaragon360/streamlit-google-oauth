@@ -19,6 +19,8 @@ def historial(data):
 def authTHV(data):
     response = requests.post("https://thevalley.es/lms/gpt_app/auth.php", data=data)
     return response.text
+    
+st.markdown('<div id="logoth" style="z-index: 9999999; background: url(https://thevalley.es/lms/i/logow.png);  width: 200px;  height: 27px;  position: fixed;  background-repeat: no-repeat;  background-size: auto 100%;  top: 1.1em;  left: 1em;"></div>', unsafe_allow_html=True)
 
 # Define the OAuth2 scopes
 SCOPES = [
@@ -65,9 +67,13 @@ def main():
             
     if 'credentials' not in st.session_state:
         # Display login screen
-        st.title("Login with Google")
+        st.title("The Valley ChatGPT")
+        st.write("Bienvenido a la aplicación GPT-4 de OpenAI ofrecido por The Valley")
+        st.write("Esta aplicación es gratuita para uso educativo.")
         auth_url, _ = flow.authorization_url(prompt='consent')
-        st.link_button("Identifícate", f'{auth_url}')
+        st.link_button("Identifícate y empieza a usarla", f'{auth_url}')
+        st.caption("¿Actualmente estás cursando un programa y quieres acceso?")
+        st.link_button("Solicita acceso", f'{auth_url}')
         st.stop()
     else:
         # # User is authenticated, show the content screen
@@ -124,7 +130,6 @@ if "authed" not in st.session_state:
 # Set up the page
 #st.set_page_config(page_title="Asistente")
 
-st.markdown('<div id="logoth" style="z-index: 9999999; background: url(https://thevalley.es/lms/i/logow.png);  width: 200px;  height: 27px;  position: fixed;  background-repeat: no-repeat;  background-size: auto 100%;  top: 1.1em;  left: 1em;"></div>', unsafe_allow_html=True)
 
 #st.sidebar.markdown("Por Pedro Aragón", unsafe_allow_html=True)
 

@@ -35,11 +35,17 @@ def main():
     # Check for the code parameter in the URL query parameters
     query_params = st.experimental_get_query_params()
     if 'code' in query_params:
-        # Complete the authentication process
-        flow.fetch_token(code=query_params['code'][0])
-        credentials = flow.credentials
-        st.session_state['credentials'] = credentials.to_json()  # Store as JSON string
-
+        try:
+            # Complete the authentication process
+            flow.fetch_token(code=query_params['code'][0])
+            credentials = flow.credentials
+            st.session_state['credentials'] = credentials.to_json()
+        except Exception as e:
+            # Handle exceptions and display an error message or redirect to login
+            st.error("An error occurred during authentication. Please try logging in again.")
+            st.markdown(f'[Login]({flow.authorization_url(prompt="consent")[0]})', unsafe_allow_html=True)
+            return
+            
     if 'credentials' not in st.session_state:
         # Display login screen
         st.title("Login with Google")

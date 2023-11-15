@@ -2,8 +2,9 @@ import streamlit as st
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 import requests
+import json  # Import the json module
 
-# Define the OAuth2 scopes (including 'openid')
+# Define the OAuth2 scopes
 SCOPES = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
@@ -37,7 +38,7 @@ def main():
         # Complete the authentication process
         flow.fetch_token(code=query_params['code'][0])
         credentials = flow.credentials
-        st.session_state['credentials'] = credentials.to_json()
+        st.session_state['credentials'] = credentials.to_json()  # Store as JSON string
 
     if 'credentials' not in st.session_state:
         # Display login screen
@@ -47,7 +48,9 @@ def main():
     else:
         # User is authenticated, show the content screen
         st.title("Welcome to the App")
-        credentials = Credentials.from_authorized_user_info(st.session_state['credentials'])
+        # Convert JSON string back to dictionary
+        credentials_dict = json.loads(st.session_state['credentials'])
+        credentials = Credentials.from_authorized_user_info(credentials_dict)
         
         # Make a request to Google's user info endpoint
         userinfo_response = requests.get(

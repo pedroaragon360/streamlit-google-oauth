@@ -70,18 +70,18 @@ def main():
         # # User is authenticated, show the content screen
         # st.title("Welcome to the App")
         # # Convert JSON string back to dictionary
-        # credentials_dict = json.loads(st.session_state['credentials'])
-        # credentials = Credentials.from_authorized_user_info(credentials_dict)
+        credentials_dict = json.loads(st.session_state['credentials'])
+        credentials = Credentials.from_authorized_user_info(credentials_dict)
         
-        # # Make a request to Google's user info endpoint
-        # userinfo_response = requests.get(
-        #     'https://www.googleapis.com/oauth2/v3/userinfo',
-        #     headers={'Authorization': f'Bearer {credentials.token}'}
-        # )
+        # Make a request to Google's user info endpoint
+        userinfo_response = requests.get(
+            'https://www.googleapis.com/oauth2/v3/userinfo',
+            headers={'Authorization': f'Bearer {credentials.token}'}
+        )
         
-        # user_info = userinfo_response.json()
+        st.session_state.user_info = userinfo_response.json()
         # st.write(f"User info: {user_info}")
-        st.write("")
+        # st.write("")
 
 
 # Run the app
@@ -204,7 +204,7 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                             #message_text = message_text.replace("\n", "\n\n")
                             message_text = re.sub(pattern, '', message_text)
                             st.markdown(message_text)
-                            historial({"role": message.role, "message": message_text})
+                            historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": message_text})
                             #st.write("Msg:", message)
     
                             # Check for and display image from annotations

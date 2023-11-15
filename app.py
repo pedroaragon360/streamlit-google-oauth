@@ -24,34 +24,46 @@ def init_flow():
         redirect_uri=st.secrets['REDIRECT_URI']
     )
 
+# JavaScript to open a new window for Google OAuth2
+def open_auth_window(auth_url):
+    js = f"""
+    <script>
+    var authWindow = window.open('{auth_url}', 'Google Auth', 'width=500,height=600');
+
+    // Listener for receiving message from the auth window
+    window.addEventListener('message', function(event) {{
+        if (event.data.type === 'authCode') {{
+            // Handle the received auth code
+            var authCode = event.data.code;
+            // Use Streamlit's methods to handle auth code
+            // ... [handle the auth code in Streamlit] ...
+        }}
+    }}, false);
+    </script>
+    """
+    components.html(js, height=0)
+
 # Streamlit app layout
 def main():
-    flow = init_flow()  # Initialize the flow object here
-
-    # Check for the code parameter in the URL query parameters
-    query_params = st.experimental_get_query_params()
-    if 'code' in query_params:
-        # Complete the authentication process
-        flow.fetch_token(code=query_params['code'][0])
-        credentials = flow.credentials
-        st.session_state['credentials'] = credentials.to_json()
+    flow = init_flow()
 
     if 'credentials' not in st.session_state:
         # Display login screen
         st.title("Login with Google")
-        auth_url, _ = flow.authorization_url(prompt='consent')  # Use the flow object
-        st.markdown(f'[Login]({auth_url})', unsafe_allow_html=True)
-    else:
+        auth_url, _ = flow.authorization_url(prompt='consent')
+        open_auth_window(auth_url)
+
+    if 'credentials' in st.session_state:
         # User is authenticated, show the content screen
         st.title("Welcome to the App")
         credentials = Credentials.from_authorized_user_info(st.session_state['credentials'])
-        
+
         # Make a request to Google's user info endpoint
         userinfo_response = requests.get(
             'https://www.googleapis.com/oauth2/v3/userinfo',
             headers={'Authorization': f'Bearer {credentials.token}'}
         )
-        
+
         user_info = userinfo_response.json()
         st.write(f"User info: {user_info}")
 

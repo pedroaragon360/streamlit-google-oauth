@@ -80,7 +80,7 @@ def main():
         )
         
         st.session_state.user_info = userinfo_response.json()
-        # st.write(f"User info: {user_info}")
+        st.write(f"User info: {userinfo_response.json()}")
         # st.write("")
 
 

@@ -18,7 +18,7 @@ def historial(data):
     response = requests.post("https://thevalley.es/lms/gpt_app/historial.php", data=data)
 def authTHV(data):
     response = requests.post("https://thevalley.es/lms/gpt_app/auth.php", data=data)
-    return response
+    return response.text
 
 # Define the OAuth2 scopes
 SCOPES = [

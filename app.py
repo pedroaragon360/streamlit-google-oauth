@@ -49,7 +49,7 @@ if __name__ == '__main__':
         try:
             code = st.experimental_get_query_params()['code']
         except:
-            st.write(f'''<h1><a  data-onsuccess="onSignIn" data-ux_mode="redirect" 
+            st.write(f'''<h1><a  data-onsuccess="onSignIn" target="_blank" data-ux_mode="redirect" 
                 href="{authorization_url}">Identifícate</a> para usar la aplicación</h1>''',
                      unsafe_allow_html=True)
         else:

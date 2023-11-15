@@ -2,6 +2,7 @@ import streamlit as st
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 import requests
+import streamlit.components.v1 as components
 
 # Define the OAuth2 scopes
 SCOPES = ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
@@ -23,34 +24,40 @@ def init_flow():
         redirect_uri=st.secrets['REDIRECT_URI']
     )
 
-# Function to perform authentication
-def authenticate_user(flow):
-    authorization_url, state = flow.authorization_url()
-    st.session_state['state'] = state
-    return authorization_url
-
-# Function to handle callback from Google OAuth
-def callback(flow):
-    flow.fetch_token(authorization_response=st.session_state['auth_url'])
-    credentials = flow.credentials
-    return credentials
+# Function to capture URL parameters with JavaScript
+def get_url_params():
+    js = """
+    window.onload = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlParams.entries());
+        if (Object.keys(params).length > 0) {
+            window.parent.postMessage({type: 'urlParams', data: params}, '*');
+        }
+    }
+    """
+    components.html(f"<script>{js}</script>", height=0)
 
 # Streamlit app layout
 def main():
+    get_url_params()
     flow = init_flow()
 
-    # Check if the user is already authenticated
+    # Check for URL parameters in session state
+    if 'urlParams' in st.session_state:
+        params = st.session_state.urlParams
+        if 'code' in params and 'state' in params:
+            # Complete the authentication process
+            flow.fetch_token(code=params['code'])
+            credentials = flow.credentials
+            st.session_state['credentials'] = credentials.to_json()
+            del st.session_state['urlParams']
+
     if 'credentials' not in st.session_state:
         # Display login screen
         st.title("Login with Google")
-        auth_url = authenticate_user(flow)
+        auth_url, _ = flow.authorization_url(prompt='consent')
         st.markdown(f'[Login]({auth_url})', unsafe_allow_html=True)
-
-        if 'auth_url' in st.session_state:
-            credentials = callback(flow)
-            st.session_state['credentials'] = credentials.to_json()
-
-    if 'credentials' in st.session_state:
+    else:
         # User is authenticated, show the content screen
         st.title("Welcome to the App")
         credentials = Credentials.from_authorized_user_info(st.session_state['credentials'])

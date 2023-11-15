@@ -2,7 +2,6 @@ import streamlit as st
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 import requests
-import streamlit.components.v1 as components
 
 # Define the OAuth2 scopes
 SCOPES = ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
@@ -24,33 +23,17 @@ def init_flow():
         redirect_uri=st.secrets['REDIRECT_URI']
     )
 
-# Function to capture URL parameters with JavaScript
-def get_url_params():
-    js = """
-    window.onload = () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const params = Object.fromEntries(urlParams.entries());
-        if (Object.keys(params).length > 0) {
-            window.parent.postMessage({type: 'urlParams', data: params}, '*');
-        }
-    }
-    """
-    components.html(f"<script>{js}</script>", height=0)
-
 # Streamlit app layout
 def main():
-    get_url_params()
     flow = init_flow()
 
-    # Check for URL parameters in session state
-    if 'urlParams' in st.session_state:
-        params = st.session_state.urlParams
-        if 'code' in params and 'state' in params:
-            # Complete the authentication process
-            flow.fetch_token(code=params['code'])
-            credentials = flow.credentials
-            st.session_state['credentials'] = credentials.to_json()
-            del st.session_state['urlParams']
+    # Check for the code parameter in the URL query parameters
+    query_params = st.experimental_get_query_params()
+    if 'code' in query_params:
+        # Complete the authentication process
+        flow.fetch_token(code=query_params['code'][0])
+        credentials = flow.credentials
+        st.session_state['credentials'] = credentials.to_json()
 
     if 'credentials' not in st.session_state:
         # Display login screen

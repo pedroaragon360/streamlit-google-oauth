@@ -14,6 +14,9 @@ import base64
 from openai import OpenAI
 import mimetypes
 
+def historial(data):
+    response = requests.post("https://thevalley.es/lms/gpt_app/historial.php", data=data)
+
 def gptapp():
 
     # Initialize OpenAI client
@@ -127,6 +130,7 @@ def gptapp():
                                 #message_text = message_text.replace("\n", "\n\n")
                                 message_text = re.sub(pattern, '', message_text)
                                 st.markdown(message_text)
+                                historial({"role": message.role, "message": message_text})
                                 #st.write("Msg:", message)
         
                                 # Check for and display image from annotations

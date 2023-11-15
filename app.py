@@ -58,7 +58,7 @@ def gptapp():
     
     with tab1:
         with st.chat_message('assistant'):
-            st.caption('Esta aplicación está disponible para uso educativo. Tus prompts son registrados para evitar abusos.')
+            st.caption('Esta aplicación está disponible para uso educativo, úsalo con responsabilidad. Tu actividad queda guardada en "Historial".')
             st.write('¡Hola! Soy el asistente GPT de The Valley. ¿cómo te puedo ayudar?')
             
     if uploaded_file is not None:

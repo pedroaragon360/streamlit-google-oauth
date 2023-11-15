@@ -50,7 +50,7 @@ if __name__ == '__main__':
             code = st.experimental_get_query_params()['code']
         except:
             st.write(f'''<h1>
-                Please login using this <a target="_self"
+                Please login using this <a 
                 href="{authorization_url}">url</a></h1>''',
                      unsafe_allow_html=True)
         else:

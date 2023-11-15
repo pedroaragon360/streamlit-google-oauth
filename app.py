@@ -79,7 +79,7 @@ def main():
             headers={'Authorization': f'Bearer {credentials.token}'}
         )
         
-        st.session_state.user_info = userinfo_response.json()
+        st.session_state.user_info = userinfo_response.json().get('email', '-')
         st.write(f"User info: {st.session_state.user_info}")
         # st.write("")
 

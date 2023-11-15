@@ -16,6 +16,9 @@ import mimetypes
 
 def historial(data):
     response = requests.post("https://thevalley.es/lms/gpt_app/historial.php", data=data)
+def authTHV(data):
+    response = requests.post("https://thevalley.es/lms/gpt_app/auth.php", data=data)
+    return response
 
 # Define the OAuth2 scopes
 SCOPES = [
@@ -80,6 +83,10 @@ def main():
         )
         
         st.session_state.user_info = userinfo_response.json().get('email', '-')
+        checkAuth = authTHV({"user":st.session_state.user_info})
+        if checkAuth != "1":
+            st.title("No tienes acceso por The Valley" + checkAuth)
+            
         st.write(f"User info: {st.session_state.user_info}")
         # st.write("")
 

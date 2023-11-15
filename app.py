@@ -14,74 +14,6 @@ import base64
 from openai import OpenAI
 import mimetypes
 
-# Define the OAuth2 scopes
-SCOPES = [
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-    'openid'  # Include the 'openid' scope
-]
-
-# Function to initialize the flow object with client ID and secret from Streamlit secrets
-def init_flow():
-    return Flow.from_client_config(
-        client_config={
-            "web": {
-                "client_id": st.secrets['GOOGLE_CLIENT_ID'],
-                "client_secret": st.secrets['GOOGLE_CLIENT_SECRET'],
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token",
-                "redirect_uris": [st.secrets['REDIRECT_URI']],
-                "scopes": SCOPES
-            }
-        },
-        scopes=SCOPES,
-        redirect_uri=st.secrets['REDIRECT_URI']
-    )
-
-# Streamlit app layout
-def main():
-    flow = init_flow()
-
-    # Check for the code parameter in the URL query parameters
-    query_params = st.experimental_get_query_params()
-    if 'code' in query_params:
-        try:
-            # Complete the authentication process
-            flow.fetch_token(code=query_params['code'][0])
-            credentials = flow.credentials
-            st.session_state['credentials'] = credentials.to_json()
-        except Exception as e:
-            # Handle exceptions and display an error message or redirect to login
-            st.error("An error occurred during authentication. Please try logging in again.")
-            st.link_button("Identifícate", f'{flow.authorization_url(prompt="consent")[0]}')
-            return
-            
-    if 'credentials' not in st.session_state:
-        # Display login screen
-        st.title("Login with Google")
-        auth_url, _ = flow.authorization_url(prompt='consent')
-        st.link_button("Identifícate", f'{auth_url}')
-    else:
-        # # User is authenticated, show the content screen
-        # st.title("Welcome to the App")
-        # # Convert JSON string back to dictionary
-        # credentials_dict = json.loads(st.session_state['credentials'])
-        # credentials = Credentials.from_authorized_user_info(credentials_dict)
-        
-        # # Make a request to Google's user info endpoint
-        # userinfo_response = requests.get(
-        #     'https://www.googleapis.com/oauth2/v3/userinfo',
-        #     headers={'Authorization': f'Bearer {credentials.token}'}
-        # )
-        
-        # user_info = userinfo_response.json()
-        # st.write(f"User info: {user_info}")
-        gptapp()
-
-# Run the app
-if __name__ == "__main__":
-    main()
-
 def gptapp():
 
     # Initialize OpenAI client
@@ -300,3 +232,70 @@ def gptapp():
             if st.session_state.retry_error < 3:
                 time.sleep(3)
                 st.rerun()
+# Define the OAuth2 scopes
+SCOPES = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'openid'  # Include the 'openid' scope
+]
+
+# Function to initialize the flow object with client ID and secret from Streamlit secrets
+def init_flow():
+    return Flow.from_client_config(
+        client_config={
+            "web": {
+                "client_id": st.secrets['GOOGLE_CLIENT_ID'],
+                "client_secret": st.secrets['GOOGLE_CLIENT_SECRET'],
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "redirect_uris": [st.secrets['REDIRECT_URI']],
+                "scopes": SCOPES
+            }
+        },
+        scopes=SCOPES,
+        redirect_uri=st.secrets['REDIRECT_URI']
+    )
+
+# Streamlit app layout
+def main():
+    flow = init_flow()
+
+    # Check for the code parameter in the URL query parameters
+    query_params = st.experimental_get_query_params()
+    if 'code' in query_params:
+        try:
+            # Complete the authentication process
+            flow.fetch_token(code=query_params['code'][0])
+            credentials = flow.credentials
+            st.session_state['credentials'] = credentials.to_json()
+        except Exception as e:
+            # Handle exceptions and display an error message or redirect to login
+            st.error("An error occurred during authentication. Please try logging in again.")
+            st.link_button("Identifícate", f'{flow.authorization_url(prompt="consent")[0]}')
+            return
+            
+    if 'credentials' not in st.session_state:
+        # Display login screen
+        st.title("Login with Google")
+        auth_url, _ = flow.authorization_url(prompt='consent')
+        st.link_button("Identifícate", f'{auth_url}')
+    else:
+        # # User is authenticated, show the content screen
+        # st.title("Welcome to the App")
+        # # Convert JSON string back to dictionary
+        # credentials_dict = json.loads(st.session_state['credentials'])
+        # credentials = Credentials.from_authorized_user_info(credentials_dict)
+        
+        # # Make a request to Google's user info endpoint
+        # userinfo_response = requests.get(
+        #     'https://www.googleapis.com/oauth2/v3/userinfo',
+        #     headers={'Authorization': f'Bearer {credentials.token}'}
+        # )
+        
+        # user_info = userinfo_response.json()
+        # st.write(f"User info: {user_info}")
+        gptapp()
+
+# Run the app
+if __name__ == "__main__":
+    main()

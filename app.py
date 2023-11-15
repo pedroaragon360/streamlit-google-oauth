@@ -24,21 +24,17 @@ def init_flow():
         redirect_uri=st.secrets['REDIRECT_URI']
     )
 
-# JavaScript to open a new window for Google OAuth2
-def open_auth_window(auth_url):
-    js = f"""
+# JavaScript to listen for the auth code
+def listen_for_auth_code():
+    js = """
     <script>
-    var authWindow = window.open('{auth_url}', 'Google Auth', 'width=500,height=600');
-
-    // Listener for receiving message from the auth window
-    window.addEventListener('message', function(event) {{
-        if (event.data.type === 'authCode') {{
-            // Handle the received auth code
-            var authCode = event.data.code;
-            // Use Streamlit's methods to handle auth code
+    window.addEventListener('message', (event) => {
+        if (event.data.type === 'authCode') {
+            const authCode = event.data.code;
+            // Send auth code to Streamlit's server
             // ... [handle the auth code in Streamlit] ...
-        }}
-    }}, false);
+        }
+    }, false);
     </script>
     """
     components.html(js, height=0)
@@ -46,12 +42,13 @@ def open_auth_window(auth_url):
 # Streamlit app layout
 def main():
     flow = init_flow()
+    listen_for_auth_code()
 
     if 'credentials' not in st.session_state:
         # Display login screen
         st.title("Login with Google")
         auth_url, _ = flow.authorization_url(prompt='consent')
-        open_auth_window(auth_url)
+        st.markdown(f'<a href="{auth_url}" target="_blank">Login</a>', unsafe_allow_html=True)
 
     if 'credentials' in st.session_state:
         # User is authenticated, show the content screen

@@ -61,7 +61,7 @@ def main():
         except Exception as e:
             # Handle exceptions and display an error message or redirect to login
             st.error("An error occurred during authentication. Please try logging in again.")
-            st.link_button("Identifícate", f'{flow.authorization_url(prompt="consent")[0]}')
+            st.link_button("Identifícate", f'{flow.authorization_url(prompt="consent")[0]}', type="primary")
             st.stop()
             return
             

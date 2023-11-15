@@ -81,7 +81,7 @@ def main():
         
         # user_info = userinfo_response.json()
         # st.write(f"User info: {user_info}")
-        gptapp()
+
 
 # Run the app
 if __name__ == "__main__":

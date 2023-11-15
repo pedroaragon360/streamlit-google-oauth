@@ -43,15 +43,14 @@ def main():
         except Exception as e:
             # Handle exceptions and display an error message or redirect to login
             st.error("An error occurred during authentication. Please try logging in again.")
-            st.markdown(f'[Login]({flow.authorization_url(prompt="consent")[0]})', unsafe_allow_html=True)
+            st.link_button("Identifícate", f'{flow.authorization_url(prompt="consent")[0]}')
             return
             
     if 'credentials' not in st.session_state:
         # Display login screen
         st.title("Login with Google")
         auth_url, _ = flow.authorization_url(prompt='consent')
-        st.markdown(f'<a href="{auth_url}">Login</a>', unsafe_allow_html=True)
-
+        st.link_button("Identifícate", f'{auth_url}')
     else:
         # User is authenticated, show the content screen
         st.title("Welcome to the App")

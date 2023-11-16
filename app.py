@@ -219,6 +219,7 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                             pattern = r'\[.*?\]\(sandbox:.*?\)'
                             #message_text = message_text.replace("\n", "\n\n")
                             message_text = re.sub(pattern, '', message_text)
+                            st.write(message)
                             st.markdown(message_text)
                             historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": message_text})
                             #st.write("Msg:", message)

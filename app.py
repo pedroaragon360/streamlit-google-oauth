@@ -22,6 +22,8 @@ st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allo
 
 def historial(data):    
     if data["id"] not in st.session_state.savedMessages:
+        if data["role"] == 'assistant':
+            st.session_state["disabled"] = False
         st.session_state.savedMessages.append(data["id"])
         response = requests.post("https://thevalley.es/lms/gpt_app/historial.php", data=data)
         
@@ -198,7 +200,6 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                             message_text = re.sub(pattern, '', message_text)
                             st.markdown(message_text)
                             historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": message_text, "id": message.id})
-                            st.session_state["disabled"] = False
                             #st.write("Msg:", message)
     
                             # Check for and display image from annotations

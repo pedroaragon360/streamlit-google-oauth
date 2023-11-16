@@ -154,8 +154,6 @@ st.markdown('<style>[data-baseweb=tab-list] {   position: fixed !important; top:
 if 'uploader_key' not in st.session_state:
     st.session_state.uploader_key = 0
 
-
-
 # File uploader for CSV, XLS, XLSX
 with tab2:
     uploaded_file = st.file_uploader("", type=["csv", "xls", "json", "xlsx"], key=f'file_uploader_{st.session_state.uploader_key}')
@@ -164,38 +162,6 @@ with tab1:
     with st.chat_message('assistant'):
         st.caption('Esta aplicación está disponible para uso educativo, úsalo con responsabilidad. Tu actividad queda guardada en "Historial".')
         st.write('¡Hola! Soy el asistente GPT de The Valley. ¿cómo te puedo ayudar?')
-        
-if uploaded_file is not None:
-    # Determine the file type
-    file_type = uploaded_file.type
-
-    try:
-        file_stream = uploaded_file.getvalue()
-        file_response = client.files.create(file=file_stream, purpose='assistants')
-        st.session_state.file_id = file_response.id
-        st.session_state.file_name = uploaded_file.name
-        with tab2:
-            st.success(f"Archivo subido. File ID: {file_response.id}")
-            historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": 'user', "message": f"Archivo subido: {uploaded_file.name} ID: {file_response.id}", "id": file_response.id})
-        # Determine MIME type
-        mime_type, _ = mimetypes.guess_type(uploaded_file.name)
-        if mime_type is None:
-            mime_type = "application/octet-stream"  # Default for unknown types
-    
-        # Create download button
-        with tab2:
-            st.download_button(
-                label="Descargar fichero subido",
-                data=file_stream,
-                file_name=uploaded_file.name,
-                mime=mime_type
-            )
-
-        # Reset the uploader by changing the key
-        st.session_state.uploader_key += 1
-       
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
         
 # Initialize OpenAI assistant
 if "assistant" not in st.session_state:
@@ -313,6 +279,37 @@ if prompt := st.chat_input("How can I help you?"):
         time.sleep(1)
         st.rerun()
         
+if uploaded_file is not None:
+    # Determine the file type
+    file_type = uploaded_file.type
+    try:
+        file_stream = uploaded_file.getvalue()
+        file_response = client.files.create(file=file_stream, purpose='assistants')
+        st.session_state.file_id = file_response.id
+        st.session_state.file_name = uploaded_file.name
+        with tab2:
+            st.success(f"Archivo subido. File ID: {file_response.id}")
+            historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": 'user', "message": f"Archivo subido: {uploaded_file.name} ID: {file_response.id}", "id": file_response.id})
+        # Determine MIME type
+        mime_type, _ = mimetypes.guess_type(uploaded_file.name)
+        if mime_type is None:
+            mime_type = "application/octet-stream"  # Default for unknown types
+    
+        # Create download button
+        with tab2:
+            st.download_button(
+                label="Descargar fichero subido",
+                data=file_stream,
+                file_name=uploaded_file.name,
+                mime=mime_type
+            )
+
+        # Reset the uploader by changing the key
+        st.session_state.uploader_key += 1
+       
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+                
 with tab3: 
     # Parse the JSON string to a Python list
     getThreads({"user":st.session_state.user_info})

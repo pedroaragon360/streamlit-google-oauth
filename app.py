@@ -19,6 +19,9 @@ def historial(data):
 def authTHV(data):
     response = requests.post("https://thevalley.es/lms/gpt_app/auth.php", data=data)
     return response.text
+def getThreads(data):
+    response = requests.post("https://thevalley.es/lms/gpt_app/threads.php", data=data)
+    return response.text
     
 st.markdown('<div id="logoth" style="z-index: 9999999; background: url(https://thevalley.es/lms/i/logow.png);  width: 200px;  height: 27px;  position: fixed;  background-repeat: no-repeat;  background-size: auto 100%;  top: 1.1em;  left: 1em;"></div>', unsafe_allow_html=True)
 
@@ -295,7 +298,14 @@ if prompt := st.chat_input("How can I help you?"):
     if st.session_state.retry_error < 3:
         time.sleep(1)
         st.rerun()
-
+        
+with tab3: 
+    # Parse the JSON string to a Python list
+    threads = json.loads(getThreads({"user":st.session_state.user_info}))
+    # Iterate over the list and display each thread
+    for thread in threads:
+        st.link_button("Conversación" + str(thread), "https://google.com/"+str(thread))
+        
 # Handle run status
 if hasattr(st.session_state.run, 'status'):
     if st.session_state.run.status == "running":

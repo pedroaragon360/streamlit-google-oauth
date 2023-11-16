@@ -95,7 +95,7 @@ def main():
             st.write("No tienes acceso actualmente a esta aplicación. \n Si estás cursando un programa en estos momentos, solicita tu alta escribiendo a altagpt@thevalley.es")
             st.stop()
             
-        st.write(f"User info: {st.session_state.user_info}")
+        #st.write(f"User info: {st.session_state.user_info}")
         # st.write("")
 
 

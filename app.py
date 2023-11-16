@@ -31,7 +31,7 @@ def authTHV(data):
 def getThreads(data):
     st.session_state.threads = json.loads(requests.post("https://thevalley.es/lms/gpt_app/threads.php", data=data).text)
     
-st.markdown('<div id="logoth" style="z-index: 9999999; background: url(https://thevalley.es/lms/gpt_app/logo.png);  width: 200px;  height: 27px;  position: fixed;  background-repeat: no-repeat;  background-size: auto 100%;  top: 1.1em;  left: 1em;"></div>', unsafe_allow_html=True)
+st.markdown('<div id="logoth" style="z-index: 9999999; background: url(https://thevalley.es/lms/gpt_app/logow.png);  width: 200px;  height: 27px;  position: fixed;  background-repeat: no-repeat;  background-size: auto 100%;  top: 1.1em;  left: 1em;"></div>', unsafe_allow_html=True)
 
 # Define the OAuth2 scopes
 SCOPES = [

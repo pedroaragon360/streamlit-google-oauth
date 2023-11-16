@@ -252,7 +252,7 @@ def disable():
     st.session_state["disabled"] = True
 
 # Chat input and message creation with file ID
-if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state.disabled, on_change=disable)
+if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state.disabled, on_change=disable):
     prompt_raw=prompt
     #prompt = prompt.replace("\n", "\n\n")
     if "file_id" in st.session_state and "file_name" in st.session_state:

@@ -257,7 +257,7 @@ if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state
     #prompt = prompt.replace("\n", "\n\n")
     if "file_id" in st.session_state and "file_name" in st.session_state:
     #     prompt_raw = "Renombra el archivo " + str(st.session_state.file_id) + " por " + str(st.session_state.file_name) + ". " + prompt_raw
-        prompt_raw = str(st.session_state.file_id) +" es un archivo en formato JSON. "  + prompt_raw
+        prompt_raw = f"{st.session_state.file_id} es un archivo en formato {st.session_state.file_format}. {prompt_raw}"
     message_data = {
         "thread_id": st.session_state.thread.id,
         "role": "user",
@@ -310,6 +310,7 @@ if uploaded_file is not None:
         # file_stream = uploaded_file.getvalue()
         # file_response = client.files.create(file=file_stream, purpose='assistants')
         st.session_state.file_id = file_response.id
+        st.session_state.file_format = file_type
         st.session_state.file_name = uploaded_file.name
         with tab2:
             st.success(f"Archivo subido. File ID: {file_response.id}")

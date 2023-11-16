@@ -176,6 +176,7 @@ if uploaded_file is not None:
         st.session_state.file_name = uploaded_file.name
         with tab2:
             st.success(f"Archivo subido. File ID: {file_response.id}")
+            historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": 'user', "message": f"Archivo subido: {uploaded_file.name} ID: {file_response.id}", "id": file_response.id})
         # Determine MIME type
         mime_type, _ = mimetypes.guess_type(uploaded_file.name)
         if mime_type is None:

@@ -63,12 +63,6 @@ def main():
             flow.fetch_token(code=query_params['code'][0])
             credentials = flow.credentials
             st.session_state['credentials'] = credentials.to_json()
-        except Exception as e:
-            # Handle exceptions and display an error message or redirect to login
-            st.error("An error occurred during authentication. Please try logging in again.")
-            st.link_button("Identifícate", f'{flow.authorization_url(prompt="consent")[0]}', type="primary")
-            st.stop()
-            return
             
     if 'credentials' not in st.session_state:
         # Display login screen

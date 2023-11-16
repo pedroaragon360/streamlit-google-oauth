@@ -20,7 +20,7 @@ def authTHV(data):
     response = requests.post("https://thevalley.es/lms/gpt_app/auth.php", data=data)
     return response.text
 def getThreads(data):
-    st.session_state.threads = requests.post("https://thevalley.es/lms/gpt_app/threads.php", data=data).text
+    st.session_state.threads = json.loads(requests.post("https://thevalley.es/lms/gpt_app/threads.php", data=data).text)
     
 st.markdown('<div id="logoth" style="z-index: 9999999; background: url(https://thevalley.es/lms/i/logow.png);  width: 200px;  height: 27px;  position: fixed;  background-repeat: no-repeat;  background-size: auto 100%;  top: 1.1em;  left: 1em;"></div>', unsafe_allow_html=True)
 
@@ -300,7 +300,7 @@ if prompt := st.chat_input("How can I help you?"):
         
 with tab3: 
     # Parse the JSON string to a Python list
-    json.loads(getThreads({"user":st.session_state.user_info}))
+    getThreads({"user":st.session_state.user_info})
     # Iterate over the list and display each thread
     for thread in st.session_state.threads:
         st.link_button("Conversación" + str(thread), "https://google.com/"+str(thread))

@@ -63,6 +63,10 @@ def main():
             flow.fetch_token(code=query_params['code'][0])
             credentials = flow.credentials
             st.session_state['credentials'] = credentials.to_json()
+        except Exception as e:
+            # Handle exceptions and display an error message or redirect to login
+            st.error("Vuelve a iniciar sesión")
+
             
     if 'credentials' not in st.session_state:
         # Display login screen

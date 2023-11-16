@@ -14,7 +14,6 @@ import base64
 from openai import OpenAI
 import mimetypes
 
-
 st.set_page_config(
     page_title="The Valley ChatGPT",
     page_icon="",

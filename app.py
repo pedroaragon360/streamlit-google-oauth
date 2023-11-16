@@ -146,7 +146,7 @@ if "authed" not in st.session_state:
 
 #st.sidebar.markdown("Por Pedro Aragón", unsafe_allow_html=True)
 
-tab1, tab2, tab3 = st.tabs(["Conversación", "Sube un fichero", "Historial"])
+tab1, tab2, tab3 = st.tabs([":speech_balloon: Conversación", ":paperclip: Sube un fichero", ":hourglass_flowing_sand: Historial", ":bug: Reportar error"])
 
 st.markdown('<style>[data-baseweb=tab-list] {   position: fixed !important; top: 0.5em;   left: 11em;   z-index: 9999999; } </style>', unsafe_allow_html=True)
 

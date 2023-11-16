@@ -157,7 +157,7 @@ if 'uploader_key' not in st.session_state:
 
 # File uploader for CSV, XLS, XLSX
 with tab2:
-    uploaded_file = st.file_uploader("", type=["csv", "xls", "json", "xlsx"], key=f'file_uploader_{st.session_state.uploader_key}')
+    uploaded_file = st.file_uploader("", type=["csv", "xls", "json", "xlsx", "pdf"], key=f'file_uploader_{st.session_state.uploader_key}')
 
 with tab1:
     with st.chat_message('assistant'):
@@ -285,17 +285,26 @@ if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state
         st.rerun()
         
 if uploaded_file is not None:
-    # Determine the file type
     file_type = uploaded_file.type
     try:
         if file_type == "text/csv":
             df = pd.read_csv(uploaded_file)
+            df = df.iloc[:200, :15]
+            json_str = df.to_json(orient='records', indent=4)
+            file_stream = io.BytesIO(json_str.encode())
+
         elif file_type in ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]:
             df = pd.read_excel(uploaded_file)
+            df = df.iloc[:200, :15]
+            json_str = df.to_json(orient='records', indent=4)
+            file_stream = io.BytesIO(json_str.encode())
 
-        # Convert DataFrame to JSON
-        json_str = df.to_json(orient='records', indent=4)
-        file_stream = io.BytesIO(json_str.encode())
+        elif file_type == "application/pdf":
+            file_stream = io.BytesIO(uploaded_file.read())
+
+        else:
+            raise ValueError("Formato de archivo no soportado")
+            
         file_response = client.files.create(file=file_stream, purpose='assistants')
 
         # file_stream = uploaded_file.getvalue()

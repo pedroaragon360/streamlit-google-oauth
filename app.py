@@ -313,8 +313,9 @@ with tab3:
     # Parse the JSON string to a Python list
     getThreads({"user":st.session_state.user_info})
     # Iterate over the list and display each thread
-    for fecha, thread in st.session_state.threads.items():
-        st.link_button(":speech_balloon: Conversación " + str(fecha), "https://thevalley.es/lms/gpt_app/thread_"+str(thread),  use_container_width=True)
+    if 'threads' in st.session_state and st.session_state.threads:
+        for fecha, thread in st.session_state.threads.items():
+            st.link_button(":speech_balloon: Conversación " + str(fecha), "https://thevalley.es/lms/gpt_app/thread_"+str(thread),  use_container_width=True)
 
 def handle_submission(input_value):
     # Process the input value here

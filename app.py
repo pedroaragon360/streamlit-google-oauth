@@ -324,7 +324,7 @@ def handle_submission(input_value):
 
 with tab4:
     # Create a text input box
-    input_text = st.caption("Por favor describe qué problema has tenido.")
+    st.title("¿Algún problema? Envíanos tu feedback")
     input_text = st.text_input("¿Qué problema has tenido en esta conversación?")
     submit_button = st.button("Dar feedback >")
     if submit_button:

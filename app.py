@@ -14,6 +14,12 @@ import base64
 from openai import OpenAI
 import mimetypes
 
+
+st.set_page_config(
+    page_title="The Valley ChatGPT",
+    page_icon="🤖",
+    layout="wide")
+
 def historial(data):    
     if data["id"] not in st.session_state.savedMessages:
         st.session_state.savedMessages.append(data["id"])

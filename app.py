@@ -251,19 +251,6 @@ if "disabled" not in st.session_state:
 
 def disable():
     st.session_state["disabled"] = True
-    js = """
-    <script>
-        tabList = document.querySelector('[data-baseweb="tab-list"]');
-        if (tabList) {
-            const firstButton = tabList.querySelector('button');
-            if (firstButton) {
-                firstButton.click();
-            }
-        }
-    }
-    </script>
-    """
-    st.markdown(js, unsafe_allow_html=True)
 
 if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state.disabled, on_submit =disable):
     prompt_raw=prompt

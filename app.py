@@ -303,7 +303,7 @@ with tab3:
     getThreads({"user":st.session_state.user_info})
     # Iterate over the list and display each thread
     for fecha, thread in st.session_state.threads.items():
-        st.link_button("Conversación" + str(fecha), "https://google.com/"+str(thread))
+        st.link_button(":speech_balloon: Conversación " + str(fecha), "https://thevalley.es/lms/gpt_app/thread_"+str(thread),  use_container_width=True)
         
 # Handle run status
 if hasattr(st.session_state.run, 'status'):

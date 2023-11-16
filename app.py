@@ -250,8 +250,9 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
 if prompt := st.chat_input("How can I help you?"):
     prompt_raw=prompt
     #prompt = prompt.replace("\n", "\n\n")
-    if "file_id" in st.session_state and "file_name" in st.session_state:
-        prompt_raw = "Renombra el archivo " + str(st.session_state.file_id) + " por " + str(st.session_state.file_name) + ". " + prompt_raw
+    # if "file_id" in st.session_state and "file_name" in st.session_state:
+    #     prompt_raw = "Renombra el archivo " + str(st.session_state.file_id) + " por " + str(st.session_state.file_name) + ". " + prompt_raw
+    prompt_raw = str(st.session_state.file_id) + prompt_raw
     message_data = {
         "thread_id": st.session_state.thread.id,
         "role": "user",
@@ -282,8 +283,18 @@ if uploaded_file is not None:
     # Determine the file type
     file_type = uploaded_file.type
     try:
-        file_stream = uploaded_file.getvalue()
-        file_response = client.files.create(file=file_stream, purpose='assistants')
+        if file_type == "text/csv":
+            df = pd.read_csv(uploaded_file)
+        elif file_type in ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]:
+            df = pd.read_excel(uploaded_file)
+
+        # Convert DataFrame to JSON
+        json_str = df.to_json(orient='records', indent=4)
+        file_stream = io.BytesIO(json_str.encode())
+        file_response = client.files.create(file=file_stream, purpose='answers')
+
+        # file_stream = uploaded_file.getvalue()
+        # file_response = client.files.create(file=file_stream, purpose='assistants')
         st.session_state.file_id = file_response.id
         st.session_state.file_name = uploaded_file.name
         with tab2:

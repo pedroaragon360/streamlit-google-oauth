@@ -257,7 +257,7 @@ if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state
     #prompt = prompt.replace("\n", "\n\n")
     if "file_id" in st.session_state and "file_name" in st.session_state:
     #     prompt_raw = "Renombra el archivo " + str(st.session_state.file_id) + " por " + str(st.session_state.file_name) + ". " + prompt_raw
-        prompt_raw = f"Acabo de subir el archivo {st.session_state.file_id} en formato {st.session_state.file_format}\n{prompt_raw}"
+        prompt_raw = f"Acabo de subir el archivo {st.session_state.file_id} en formato {st.session_state.file_format}\n\n{prompt_raw}"
     message_data = {
         "thread_id": st.session_state.thread.id,
         "role": "user",

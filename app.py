@@ -291,7 +291,7 @@ if uploaded_file is not None:
         # Convert DataFrame to JSON
         json_str = df.to_json(orient='records', indent=4)
         file_stream = io.BytesIO(json_str.encode())
-        file_response = client.files.create(file=file_stream, purpose='answers')
+        file_response = client.files.create(file=file_stream, purpose='assistants')
 
         # file_stream = uploaded_file.getvalue()
         # file_response = client.files.create(file=file_stream, purpose='assistants')

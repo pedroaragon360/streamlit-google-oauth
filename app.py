@@ -261,7 +261,7 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                             if response.status_code == 200:
                                 st.image(response.content)
                                 b64_image = base64.b64encode(response.content).decode()
-                                historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": b64_image})
+                                historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": '<img src="data:image/png;base64,'+b64_image+'">'})
                             else:
                                 st.error("Failed to retrieve image")
 

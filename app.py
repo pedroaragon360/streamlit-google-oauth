@@ -252,7 +252,7 @@ if prompt := st.chat_input("How can I help you?"):
     #prompt = prompt.replace("\n", "\n\n")
     if "file_id" in st.session_state and "file_name" in st.session_state:
     #     prompt_raw = "Renombra el archivo " + str(st.session_state.file_id) + " por " + str(st.session_state.file_name) + ". " + prompt_raw
-        prompt_raw = str(st.session_state.file_id) + prompt_raw
+        prompt_raw = str(st.session_state.file_id) +" es un archivo en formato JSON. "  + prompt_raw
     message_data = {
         "thread_id": st.session_state.thread.id,
         "role": "user",

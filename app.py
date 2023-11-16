@@ -71,7 +71,7 @@ def main():
         st.write("Bienvenido a la aplicación GPT-4 de OpenAI ofrecido por The Valley")
         st.write("Esta aplicación es gratuita para uso educativo.")
         auth_url, _ = flow.authorization_url(prompt='consent')
-        st.link_button("Identifícate y empieza a usarla", f'{auth_url}')
+        st.link_button("Identifícate y empieza a usarla", f'{auth_url}', type="primary")
         st.caption("¿Actualmente estás cursando un programa y quieres acceso?")
         st.link_button("Solicita acceso", f'{auth_url}')
         st.stop()

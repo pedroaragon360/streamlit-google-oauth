@@ -15,8 +15,8 @@ from openai import OpenAI
 import mimetypes
 
 def historial(data):    
-    if data.id not in st.session_state.savedMessages:
-        st.session_state.savedMessages.append(data.id)
+    if data["id"] not in st.session_state.savedMessages:
+        st.session_state.savedMessages.append(data["id"])
         response = requests.post("https://thevalley.es/lms/gpt_app/historial.php", data=data)
         
 def authTHV(data):

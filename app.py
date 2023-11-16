@@ -124,20 +124,16 @@ MODEL = "gpt-4-1106-preview"
 # Initialize session state variables
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
-
 if "run" not in st.session_state:
     st.session_state.run = {"status": None}
-
+# if "currentChatRole" not in st.session_state: # evitamos mostrar varias veces el rol cuando se reciben varios mensajes 
+#     st.session_state.currentChatRole = 'user' 
 if "messages" not in st.session_state:
     st.session_state.messages = []
-
 if "savedMessages" not in st.session_state:
     st.session_state.savedMessages = []
-
 if "retry_error" not in st.session_state:
     st.session_state.retry_error = 0
-
-
 if "authed" not in st.session_state:
     st.session_state.authed = 1
 
@@ -179,70 +175,71 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
         thread_id=st.session_state.thread.id
     )
     for message in reversed(st.session_state.messages.data):
-        if message.role in ["user", "assistant"]:
-            with tab1:
-                with st.chat_message(message.role):
-                    for content_part in message.content:
-                        if message.role == 'assistant':
-                            run_steps = client.beta.threads.runs.steps.list(thread_id=st.session_state.thread.id,run_id=st.session_state.run.id  )
-                            #st.write(run_steps.data)
-                            for steps in reversed(run_steps.data):
-                                if hasattr(steps.step_details, 'tool_calls'):
-                                    with st.expander("Código generado por Code Interpreter"):
-                                        st.code(steps.step_details.tool_calls[0].code_interpreter.input)
-                                    
-                    #if steps.tools[0].type == 'code_interpreter':
-                        # Handle text content
-                        if hasattr(content_part, 'text') and content_part.text:
-                            message_text = content_part.text.value
-                            pattern = r'\[.*?\]\(sandbox:.*?\)'
-                            #message_text = message_text.replace("\n", "\n\n")
-                            message_text = re.sub(pattern, '', message_text)
-                            st.markdown(message_text)
-                            historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": message_text, "id": message.id})
-                            #st.write("Msg:", message)
-    
-                            # Check for and display image from annotations
-                            if content_part.text.annotations:
-                                for annotation in content_part.text.annotations:
-                                    if hasattr(annotation, 'file_path') and annotation.file_path:
-                                        file_id = annotation.file_path.file_id
-                                        # Retrieve the image content using the file ID
-                                        file_name = client.files.retrieve(file_id).filename #eg. /mnt/data/archivo.json
-                                        response = client.files.with_raw_response.retrieve_content(file_id)
-                                        if response.status_code == 200:
-                                            b64_image = base64.b64encode(response.content).decode()
+        if message.id not in st.session_state.savedMessages:
+            if message.role in ["user", "assistant"]:
+                with tab1:
+                    with st.chat_message(message.role):
+                        for content_part in message.content:
+                            if message.role == 'assistant':
+                                run_steps = client.beta.threads.runs.steps.list(thread_id=st.session_state.thread.id,run_id=st.session_state.run.id  )
+                                #st.write(run_steps.data)
+                                for steps in reversed(run_steps.data):
+                                    if hasattr(steps.step_details, 'tool_calls'):
+                                        with st.expander("Código generado por Code Interpreter"):
+                                            st.code(steps.step_details.tool_calls[0].code_interpreter.input)
                                         
-                                            # Guess the MIME type of the file based on its extension
-                                            mime_type, _ = mimetypes.guess_type(file_name)
-                                            if mime_type is None:
-                                                mime_type = "application/octet-stream"  # Default for unknown types
-                                        
-                                            # Extract just the filename from the path
-                                            filename = file_name.split('/')[-1]
-                                        
-                                            # Create a download button with the correct MIME type and filename
-                                            href = f'<a style="border: 1px solid white;background: white; color: black; padding: 0.4em 0.8em; border-radius: 1em;" href="data:{mime_type};base64,{b64_image}" download="{filename}">Descargar {filename}</a>'
-                                            st.markdown(href, unsafe_allow_html=True)
-                                            historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": href, "id": message.id})
-                                        else:
-                                            st.error("Failed to retrieve file")
-                                        
-                        # Handle direct image content
-                        if hasattr(content_part, 'image') and content_part.image:
-                            image_url = content_part.image.url
-                            st.write("IMG API Response:", content_part.image)
-                    # Check for image file and retrieve the file ID
-                        if hasattr(content_part, 'image_file') and content_part.image_file:
-                            image_file_id = content_part.image_file.file_id
-                            # Retrieve the image content using the file ID
-                            response = client.files.with_raw_response.retrieve_content(image_file_id)
-                            if response.status_code == 200:
-                                st.image(response.content)
-                                b64_image = base64.b64encode(response.content).decode()
-                                historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": '<img src="data:image/png;base64,'+b64_image+'">', "id": message.id})
-                            else:
-                                st.error("Failed to retrieve image")
+                        #if steps.tools[0].type == 'code_interpreter':
+                            # Handle text content
+                            if hasattr(content_part, 'text') and content_part.text:
+                                message_text = content_part.text.value
+                                pattern = r'\[.*?\]\(sandbox:.*?\)'
+                                #message_text = message_text.replace("\n", "\n\n")
+                                message_text = re.sub(pattern, '', message_text)
+                                st.markdown(message_text)
+                                historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": message_text, "id": message.id})
+                                #st.write("Msg:", message)
+        
+                                # Check for and display image from annotations
+                                if content_part.text.annotations:
+                                    for annotation in content_part.text.annotations:
+                                        if hasattr(annotation, 'file_path') and annotation.file_path:
+                                            file_id = annotation.file_path.file_id
+                                            # Retrieve the image content using the file ID
+                                            file_name = client.files.retrieve(file_id).filename #eg. /mnt/data/archivo.json
+                                            response = client.files.with_raw_response.retrieve_content(file_id)
+                                            if response.status_code == 200:
+                                                b64_image = base64.b64encode(response.content).decode()
+                                            
+                                                # Guess the MIME type of the file based on its extension
+                                                mime_type, _ = mimetypes.guess_type(file_name)
+                                                if mime_type is None:
+                                                    mime_type = "application/octet-stream"  # Default for unknown types
+                                            
+                                                # Extract just the filename from the path
+                                                filename = file_name.split('/')[-1]
+                                            
+                                                # Create a download button with the correct MIME type and filename
+                                                href = f'<a style="border: 1px solid white;background: white; color: black; padding: 0.4em 0.8em; border-radius: 1em;" href="data:{mime_type};base64,{b64_image}" download="{filename}">Descargar {filename}</a>'
+                                                st.markdown(href, unsafe_allow_html=True)
+                                                historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": href, "id": message.id})
+                                            else:
+                                                st.error("Failed to retrieve file")
+                                            
+                            # Handle direct image content
+                            if hasattr(content_part, 'image') and content_part.image:
+                                image_url = content_part.image.url
+                                st.write("IMG API Response:", content_part.image)
+                        # Check for image file and retrieve the file ID
+                            if hasattr(content_part, 'image_file') and content_part.image_file:
+                                image_file_id = content_part.image_file.file_id
+                                # Retrieve the image content using the file ID
+                                response = client.files.with_raw_response.retrieve_content(image_file_id)
+                                if response.status_code == 200:
+                                    st.image(response.content)
+                                    b64_image = base64.b64encode(response.content).decode()
+                                    historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": '<img src="data:image/png;base64,'+b64_image+'">', "id": message.id})
+                                else:
+                                    st.error("Failed to retrieve image")
 
                     
 

@@ -245,6 +245,7 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                                             # Create a download button with the correct MIME type and filename
                                             href = f'<a style="border: 1px solid white;background: white; color: black; padding: 0.4em 0.8em; border-radius: 1em;" href="data:{mime_type};base64,{b64_image}" download="{filename}">Descargar {filename}</a>'
                                             st.markdown(href, unsafe_allow_html=True)
+                                            historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": href})
                                         else:
                                             st.error("Failed to retrieve file")
                                         
@@ -259,6 +260,8 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                             response = client.files.with_raw_response.retrieve_content(image_file_id)
                             if response.status_code == 200:
                                 st.image(response.content)
+                                b64_image = base64.b64encode(response.content).decode()
+                                historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": b64_image})
                             else:
                                 st.error("Failed to retrieve image")
 

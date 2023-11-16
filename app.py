@@ -198,6 +198,7 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                             message_text = re.sub(pattern, '', message_text)
                             st.markdown(message_text)
                             historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": message_text, "id": message.id})
+                            st.session_state["disabled"] = False
                             #st.write("Msg:", message)
     
                             # Check for and display image from annotations
@@ -244,10 +245,14 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
 
                     
 
+if "disabled" not in st.session_state:
+    st.session_state["disabled"] = False
 
+def disable():
+    st.session_state["disabled"] = True
 
 # Chat input and message creation with file ID
-if prompt := st.chat_input("How can I help you?"):
+if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state.disabled, on_change=disable)
     prompt_raw=prompt
     #prompt = prompt.replace("\n", "\n\n")
     if "file_id" in st.session_state and "file_name" in st.session_state:

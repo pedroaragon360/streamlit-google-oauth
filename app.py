@@ -14,8 +14,11 @@ import base64
 from openai import OpenAI
 import mimetypes
 
-def historial(data):
-    response = requests.post("https://thevalley.es/lms/gpt_app/historial.php", data=data)
+def historial(data):    
+    if data.id not in st.session_state.savedMessages:
+        st.session_state.savedMessages.append(data.id)
+        response = requests.post("https://thevalley.es/lms/gpt_app/historial.php", data=data)
+        
 def authTHV(data):
     response = requests.post("https://thevalley.es/lms/gpt_app/auth.php", data=data)
     return response.text
@@ -122,6 +125,9 @@ if "run" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+if "savedMessages" not in st.session_state:
+    st.session_state.savedMessages = []
+
 if "retry_error" not in st.session_state:
     st.session_state.retry_error = 0
 
@@ -219,9 +225,8 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                             pattern = r'\[.*?\]\(sandbox:.*?\)'
                             #message_text = message_text.replace("\n", "\n\n")
                             message_text = re.sub(pattern, '', message_text)
-                            st.write(message)
                             st.markdown(message_text)
-                            historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": message_text})
+                            historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": message_text, "id": message.id})
                             #st.write("Msg:", message)
     
                             # Check for and display image from annotations
@@ -246,7 +251,7 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                                             # Create a download button with the correct MIME type and filename
                                             href = f'<a style="border: 1px solid white;background: white; color: black; padding: 0.4em 0.8em; border-radius: 1em;" href="data:{mime_type};base64,{b64_image}" download="{filename}">Descargar {filename}</a>'
                                             st.markdown(href, unsafe_allow_html=True)
-                                            historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": href})
+                                            historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": href, "id": message.id})
                                         else:
                                             st.error("Failed to retrieve file")
                                         
@@ -262,7 +267,7 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                             if response.status_code == 200:
                                 st.image(response.content)
                                 b64_image = base64.b64encode(response.content).decode()
-                                historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": '<img src="data:image/png;base64,'+b64_image+'">'})
+                                historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": '<img src="data:image/png;base64,'+b64_image+'">', "id": message.id})
                             else:
                                 st.error("Failed to retrieve image")
 

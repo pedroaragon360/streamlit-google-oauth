@@ -16,7 +16,6 @@ import mimetypes
 
 
 st.set_page_config(
-    base="light",
     page_title="The Valley ChatGPT",
     page_icon="",
     layout="wide")

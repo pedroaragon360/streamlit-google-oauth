@@ -17,8 +17,9 @@ import mimetypes
 
 st.set_page_config(
     page_title="The Valley ChatGPT",
-    page_icon="🤖",
+    page_icon="",
     layout="wide")
+st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
 
 def historial(data):    
     if data["id"] not in st.session_state.savedMessages:
@@ -147,7 +148,7 @@ if "authed" not in st.session_state:
 
 tab1, tab2, tab3 = st.tabs(["Conversación", "Sube un fichero", "Historial"])
 
-st.markdown('<style>[data-baseweb=tab-list] {   position: fixed !important; top: 0.5em;   left: 11em;   z-index: 9999999; } [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
+st.markdown('<style>[data-baseweb=tab-list] {   position: fixed !important; top: 0.5em;   left: 11em;   z-index: 9999999; } </style>', unsafe_allow_html=True)
 
 # Initialize session state for the uploader key
 if 'uploader_key' not in st.session_state:

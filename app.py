@@ -302,8 +302,8 @@ with tab3:
     # Parse the JSON string to a Python list
     getThreads({"user":st.session_state.user_info})
     # Iterate over the list and display each thread
-    for thread in st.session_state.threads:
-        st.link_button("Conversación" + str(thread), "https://google.com/"+str(thread))
+    for fecha, thread in st.session_state.threads.items():
+        st.link_button("Conversación" + str(fecha), "https://google.com/"+str(thread))
         
 # Handle run status
 if hasattr(st.session_state.run, 'status'):

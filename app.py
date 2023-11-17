@@ -153,6 +153,7 @@ if 'uploader_key' not in st.session_state:
 
 # File uploader for CSV, XLS, XLSX
 with tab2:
+    st.caption("Tamaño máximo 3MB. Formatos soportados: PDF, CSV, XLS, XLSX, JSON")
     uploaded_file = st.file_uploader("", type=["csv", "xls", "json", "xlsx", "pdf"], key=f'file_uploader_{st.session_state.uploader_key}')
 
 with tab1:

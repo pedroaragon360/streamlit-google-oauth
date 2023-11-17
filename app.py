@@ -251,8 +251,11 @@ def disable():
 
 if tab1:
     st.session_state['current_tab'] = 'Tab 1'
+    st.rerun()
 else:
     st.session_state['current_tab'] = 'Tab X'
+    st.rerun()
+    
 st.write(st.session_state['current_tab'])
 # Update the current tab in session state
 if st.session_state.get('current_tab') != 'Tab 1':  # Example: Disable on Tab 1

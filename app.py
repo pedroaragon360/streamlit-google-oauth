@@ -249,20 +249,6 @@ if "disabled" not in st.session_state:
 def disable():
     st.session_state["disabled"] = True
 
-if tab1:
-    st.session_state['current_tab'] = 'Tab 1'
-    st.rerun()
-else:
-    st.session_state['current_tab'] = 'Tab X'
-    st.rerun()
-    
-st.write(st.session_state['current_tab'])
-# Update the current tab in session state
-if st.session_state.get('current_tab') != 'Tab 1':  # Example: Disable on Tab 1
-    st.session_state["disabled"] = True
-else:
-    st.session_state["disabled"] = False
-    
 if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state.disabled, on_submit =disable):
     prompt_raw=prompt
     #prompt = prompt.replace("\n", "\n\n")

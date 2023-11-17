@@ -249,6 +249,18 @@ if "disabled" not in st.session_state:
 def disable():
     st.session_state["disabled"] = True
 
+
+if tab1:
+    st.session_state['current_tab'] = 'Tab 1'
+else:
+    st.session_state['current_tab'] = 'Tab X'
+
+# Update the current tab in session state
+if st.session_state.get('current_tab') != 'Tab 1':  # Example: Disable on Tab 1
+    st.session_state["disabled"] = True
+else:
+    st.session_state["disabled"] = False
+    
 if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state.disabled, on_submit =disable):
     prompt_raw=prompt
     #prompt = prompt.replace("\n", "\n\n")
@@ -339,12 +351,6 @@ with tab3:
     if 'threads' in st.session_state and st.session_state.threads:
         for fecha, thread in st.session_state.threads.items():
             st.link_button(":speech_balloon: Conversación " + str(fecha), "https://thevalley.es/lms/gpt_app/thread_"+str(thread),  use_container_width=True)
-
-# Iterate over the list and display each thread
-st.sidebar.subheader("Consulta tu historial:")
-if 'threads' in st.session_state and st.session_state.threads:
-    for fecha, thread in st.session_state.threads.items():
-        st.sidebar.link_button(":speech_balloon: Conversación " + str(fecha), "https://thevalley.es/lms/gpt_app/thread_"+str(thread),  use_container_width=True)
 
 def handle_submission(input_value):
     # Process the input value here

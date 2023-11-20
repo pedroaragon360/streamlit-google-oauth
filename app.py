@@ -143,7 +143,7 @@ if "authed" not in st.session_state:
 
 #st.sidebar.markdown("Por Pedro Aragón", unsafe_allow_html=True)
 
-tab1, tab2, tab3, tab4 = st.tabs([":speech_balloon: Conversación", ":paperclip: Sube un fichero", "Historial", "Reportar error"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs([":speech_balloon: Conversación", ":paperclip: Sube un fichero", "Historial", "Reportar error", "Preguntas frecuentes"])
 
 st.markdown('<style>[data-baseweb=tab-list] {   position: fixed !important; top: 0.5em;   left: 11em;   z-index: 9999999; } </style>', unsafe_allow_html=True)
 
@@ -352,7 +352,26 @@ with tab4:
     submit_button = st.button("Dar feedback >")
     if submit_button:
         handle_submission(input_text)
+
+with tab5:
+    if "faq" not in st.session_state:
+        response = requests.post("https://thevalley.es/lms/gpt_app/historial.php", data=data)
         
+        # Convert response to JSON
+        if response.status_code == 200:
+            faq_data = response.json()  # Convert to Python object (list of lists)
+            
+            # Store in session state
+            st.session_state.faq = faq_data
+
+            # Iterate over each question-answer pair
+            for item in faq_data:
+                question, answer = item
+                st.markdown(f"**{question} \n {answer}**")
+                st.markdown(answer)
+        else:
+            st.error("Failed to fetch FAQ data")
+
 # Handle run status
 if hasattr(st.session_state.run, 'status'):
     if st.session_state.run.status == "running":

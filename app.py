@@ -355,7 +355,7 @@ with tab4:
 
 with tab5:
     if "faq" not in st.session_state:
-        response = requests.post("https://thevalley.es/lms/gpt_app/historial.php", data=data)
+        response = requests.get("https://thevalley.es/lms/gpt_app/faq.php")
         
         # Convert response to JSON
         if response.status_code == 200:

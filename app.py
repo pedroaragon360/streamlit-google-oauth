@@ -352,6 +352,7 @@ with tab4:
     submit_button = st.button("Dar feedback >")
     if submit_button:
         handle_submission(input_text)
+        
 
 with tab5:
     if "faq" not in st.session_state:
@@ -367,8 +368,8 @@ with tab5:
             # Iterate over each question-answer pair
             for item in faq_data:
                 question, answer = item
-                st.markdown(f"**{question} \n {answer}**")
-                st.markdown(answer)
+                with st.expander(f"**{question}**"):
+                    st.markdown(answer)
         else:
             st.error("Failed to fetch FAQ data")
 

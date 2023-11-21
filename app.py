@@ -371,7 +371,7 @@ with tab5:
                 with st.expander(f"**{question}**"):
                     st.markdown(answer)
         else:
-            st.error("Failed to fetch FAQ data")
+            st.error("Failed to fetch FAQ data2")
 
 # Handle run status
 if hasattr(st.session_state.run, 'status'):

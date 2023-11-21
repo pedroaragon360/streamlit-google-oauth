@@ -79,13 +79,11 @@ def main():
     if 'credentials' not in st.session_state:
         # Display login screen
         st.title("The Valley ChatGPT")
-        st.write("Bienvenido a la aplicación GPT-4 de OpenAI ofrecido por The Valley")
-        st.write("Esta aplicación es gratuita para uso educativo.")
+        st.markdown("Bienvenido a la aplicación GPT-4 de OpenAI ofrecido por The Valley.<br>Esta aplicación es gratuita para uso educativo.")
         auth_url, _ = flow.authorization_url(prompt='consent')
-        st.link_button("Acceso interno", f'{auth_url}', type="primary")
 
         with st.form("login"):
-            st.write("Identifícate como alumno")
+            st.write("Soy Alumno")
             femail = st.text_input('Email')
             fpass = st.text_input('Clave', type='password')
             # Every form must have a submit button.
@@ -97,7 +95,7 @@ def main():
                     st.rerun()
                 else:
                     st.error("Login incorrecto, inténtalo de nuevo")
-
+        st.link_button("Acceso interno", f'{auth_url}', type="primary")
         st.caption("¿Actualmente estás cursando un programa y quieres acceso?")
         st.link_button("Solicita acceso", f'{auth_url}')
         st.stop()

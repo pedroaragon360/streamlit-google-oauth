@@ -81,9 +81,9 @@ def main():
             st.error("Vuelve a iniciar sesión")
 
     if 'email' in query_params:
-        st.session_state.user_email = query_params["email"]
+        st.session_state.user_email = query_params["email"][0]
     if 'pass' in query_params:
-        st.session_state.user_pass = query_params["pass"]
+        st.session_state.user_pass = query_params["pass"][0]
 
     if 'credentials' not in st.session_state:
         # Display login screen

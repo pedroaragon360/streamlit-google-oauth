@@ -85,13 +85,13 @@ def main():
         st.link_button("Acceso interno", f'{auth_url}', type="primary")
 
         with st.form("login"):
-        st.write("Identifícate como alumno")
-        femail = st.text_input('Email')
-        fpass = st.text_input('Clave', type='password')
-        # Every form must have a submit button.
-        submitted = st.form_submit_button("Entrar  >")
-        if submitted:
-            st.write(requests.post("https://thevalley.es/lms/gpt_app/historial.php", data={'email': femail, 'pass': fpass}))
+            st.write("Identifícate como alumno")
+            femail = st.text_input('Email')
+            fpass = st.text_input('Clave', type='password')
+            # Every form must have a submit button.
+            submitted = st.form_submit_button("Entrar  >")
+            if submitted:
+                st.write(requests.post("https://thevalley.es/lms/gpt_app/historial.php", data={'email': femail, 'pass': fpass}))
 
         st.caption("¿Actualmente estás cursando un programa y quieres acceso?")
         st.link_button("Solicita acceso", f'{auth_url}')

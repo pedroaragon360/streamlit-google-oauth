@@ -14,6 +14,11 @@ import base64
 from openai import OpenAI
 import mimetypes
 
+if "user_email" not in st.session_state:
+    st.session_state.user_email = None
+if "user_pass" not in st.session_state:
+    st.session_state.user_pass = None
+    
 st.set_page_config(
     page_title="The Valley ChatGPT",
     page_icon="",
@@ -84,8 +89,8 @@ def main():
 
         with st.form("login"):
             st.write("Soy Alumno")
-            femail = st.text_input('Email')
-            fpass = st.text_input('Clave', type='password')
+            femail = st.text_input('Email', value=st.session_state.user_email autocomplete="on")
+            fpass = st.text_input('Clave', type='password', value=st.session_state.user_pass autocomplete="on")
             # Every form must have a submit button.
             submitted = st.form_submit_button("Entrar  >",type = "primary")
             if submitted:

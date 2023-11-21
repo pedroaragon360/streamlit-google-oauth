@@ -87,7 +87,7 @@ def main():
             femail = st.text_input('Email')
             fpass = st.text_input('Clave', type='password')
             # Every form must have a submit button.
-            submitted = st.form_submit_button("Entrar  >")
+            submitted = st.form_submit_button("Entrar  >",type = "primary")
             if submitted:
                 if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
                     st.session_state.authed = True

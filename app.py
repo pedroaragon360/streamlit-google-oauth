@@ -80,7 +80,11 @@ def main():
             # Handle exceptions and display an error message or redirect to login
             st.error("Vuelve a iniciar sesión")
 
-            
+    if 'email' in query_params:
+        st.session_state.user_email = query_params["email"]
+    if 'pass' in query_params:
+        st.session_state.user_pass = query_params["pass"]
+
     if 'credentials' not in st.session_state:
         # Display login screen
         st.title("The Valley ChatGPT")

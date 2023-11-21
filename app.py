@@ -94,6 +94,7 @@ def main():
                 if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
                     st.session_state.authed = True
                     st.session_state.user_info = femail
+                    st.rerun()
                 else:
                     st.error("Login incorrecto, inténtalo de nuevo")
 

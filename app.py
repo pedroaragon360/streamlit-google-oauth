@@ -46,7 +46,17 @@ SCOPES = [
     'https://www.googleapis.com/auth/userinfo.profile',
     'openid'  # Include the 'openid' scope
 ]
+def login(femail,fpass):
+    if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
+        st.session_state.authed = 1
+        st.session_state.user_info = femail
 
+
+if 'email' in query_params and 'pass' in query_params:
+    login(query_params["email"][0], query_params["pass"][0])
+    st.session_state.user_email = query_params["email"][0]
+    st.session_state.user_pass = query_params["pass"][0]
+    
 # Function to initialize the flow object with client ID and secret from Streamlit secrets
 def init_flow():
     return Flow.from_client_config(
@@ -79,12 +89,7 @@ def main():
         except Exception as e:
             # Handle exceptions and display an error message or redirect to login
             st.error("Vuelve a iniciar sesión")
-
-    if 'email' in query_params:
-        st.session_state.user_email = query_params["email"][0]
-    if 'pass' in query_params:
-        st.session_state.user_pass = query_params["pass"][0]
-
+            
     if 'credentials' not in st.session_state:
         # Display login screen
         st.title("The Valley ChatGPT")
@@ -186,10 +191,17 @@ with tab1:
 # Initialize OpenAI assistant
 if "assistant" not in st.session_state:
     openai.api_key = st.secrets["OPENAI_API_KEY"]
-    st.session_state.assistant = openai.beta.assistants.retrieve(st.secrets["OPENAI_ASSISTANT"])
-    st.session_state.thread = client.beta.threads.create(
-        metadata={'session_id': st.session_state.session_id}
-    )
+    try:
+        st.session_state.assistant = openai.beta.assistants.retrieve(st.secrets["OPENAI_ASSISTANT"])
+        # Your code that might raise an error
+        st.session_state.thread = client.beta.threads.create(
+            metadata={'session_id': st.session_state.session_id}
+        )
+    except Exception as e:
+        # Handling the error
+        st.warning(f"Error: {e}")
+        # Optionally, re-raise the error if you want to propagate it further
+        raise
 
 # Display chat messages
 elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == "completed":

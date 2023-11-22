@@ -100,8 +100,8 @@ def main():
 
         with st.form("login"):
             st.write("Soy Alumno")
-            femail = st.text_input('Email', value=st.session_state.user_email, autocomplete="on")
-            fpass = st.text_input('Clave', type='password', value=st.session_state.user_pass, autocomplete="on")
+            femail = st.text_input('Email', key='campoemail', value=st.session_state.user_email, autocomplete="on")
+            fpass = st.text_input('Clave', key='campopass', type='password', value=st.session_state.user_pass, autocomplete="on")
             # Every form must have a submit button.
             submitted = st.form_submit_button("Entrar  >",type = "primary")
             if submitted:

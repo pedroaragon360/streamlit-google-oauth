@@ -95,7 +95,7 @@ def main():
     if 'credentials' not in st.session_state:
         # Display login screen
         st.title("The Valley ChatGPT")
-        st.markdown("Bienvenido a la aplicación GPT-4 de OpenAI ofrecido por The Valley.\n Esta aplicación es gratuita para uso educativo.")
+        st.markdown("Bienvenido a la aplicación GPT-4 de OpenAI ofrecido por The Valley.\n\n Esta aplicación es gratuita para uso educativo.")
         auth_url, _ = flow.authorization_url(prompt='consent')
 
 

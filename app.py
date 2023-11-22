@@ -109,8 +109,8 @@ def main():
                     st.session_state.authed = True
                     st.session_state.user_info = femail
                     st.experimental_set_query_params(
-                        email=femail,
-                        pass=fpass
+                        "email"=femail,
+                        "pass"=fpass
                     )
                     query_params = st.experimental_get_query_params()
                     st.rerun()

@@ -207,9 +207,12 @@ if "assistant" not in st.session_state:
     try:
         st.session_state.assistant = openai.beta.assistants.retrieve(st.secrets["OPENAI_ASSISTANT"])
         # Your code that might raise an error
-        st.session_state.thread = client.beta.threads.create(
-            metadata={'session_id': st.session_state.session_id}
-        )
+        if "thread_id" in query_params:
+            st.session_state.thread = client.beta.threads.retrieve(query_params.thread_id)            
+        else:
+            st.session_state.thread = client.beta.threads.create(
+                metadata={'session_id': st.session_state.session_id}
+            )
     except Exception as e:
         # Handling the error
         st.warning(f"Error: {e}")

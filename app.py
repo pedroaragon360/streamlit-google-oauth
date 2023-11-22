@@ -176,6 +176,8 @@ if "retry_error" not in st.session_state:
     st.session_state.retry_error = 0
 if "authed" not in st.session_state:
     st.session_state.authed = 1
+if "preloadThread" not in st.session_state:
+    st.session_state.preloadThread = False
 
 # Set up the page
 #st.set_page_config(page_title="Asistente")
@@ -208,7 +210,8 @@ if "assistant" not in st.session_state:
         st.session_state.assistant = openai.beta.assistants.retrieve(st.secrets["OPENAI_ASSISTANT"])
         # Your code that might raise an error
         if "thread_id" in query_params:
-            st.session_state.thread = client.beta.threads.retrieve(query_params["thread_id"][0])            
+            st.session_state.thread = client.beta.threads.retrieve(query_params["thread_id"][0])    
+            st.session_state.preloadThread = True
         else:
             st.session_state.thread = client.beta.threads.create(
                 metadata={'session_id': st.session_state.session_id}
@@ -220,7 +223,7 @@ if "assistant" not in st.session_state:
         raise
 
 # Display chat messages
-elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == "completed":
+elif (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "completed") or st.session_state.preloadThread == True:
 
     st.session_state.messages = client.beta.threads.messages.list(
         thread_id=st.session_state.thread.id

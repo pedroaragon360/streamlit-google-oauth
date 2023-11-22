@@ -108,10 +108,11 @@ def main():
                 if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
                     st.session_state.authed = True
                     st.session_state.user_info = femail
-                    st.experimental_set_query_params(
-                        "email"=femail,
-                        "pass"=fpass
-                    )
+                    params = {
+                        "email": femail,
+                        "pass": fpass
+                    }
+                    st.experimental_set_query_params(**params)
                     query_params = st.experimental_get_query_params()
                     st.rerun()
                 else:

@@ -52,8 +52,7 @@ def login(femail,fpass):
     if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
         st.session_state.authed = 1
         st.session_state.user_info = femail
-
-query_params = st.experimental_get_query_params()
+        
 if 'email' in query_params and 'pass' in query_params:
     login(query_params["email"][0], query_params["pass"][0])
     st.session_state.user_email = query_params["email"][0]
@@ -109,6 +108,11 @@ def main():
                 if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
                     st.session_state.authed = True
                     st.session_state.user_info = femail
+                    st.experimental_set_query_params(
+                        email=femail,
+                        pass=fpass
+                    )
+                    query_params = st.experimental_get_query_params()
                     st.rerun()
                 else:
                     st.error("Login incorrecto, inténtalo de nuevo")

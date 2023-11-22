@@ -117,6 +117,7 @@ def main():
             st.caption("¿Actualmente estás cursando un programa y quieres acceso?")
             st.link_button("Solicita acceso", f'{auth_url}')
         with col2:
+            st.caption("¿Eres docente o empleado?")
             st.link_button("Acceso interno", f'{auth_url}', type="primary")
         st.stop()
     else:

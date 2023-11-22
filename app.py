@@ -97,7 +97,7 @@ def main():
         st.title("The Valley ChatGPT")
         st.markdown("Bienvenido a la aplicación GPT-4 de OpenAI ofrecido por The Valley.\n Esta aplicación es gratuita para uso educativo.")
         auth_url, _ = flow.authorization_url(prompt='consent')
-        col1, col2 = st.columns(2)
+
 
         with st.form("login"):
             #st.write("Soy Alumno")
@@ -112,7 +112,7 @@ def main():
                     st.rerun()
                 else:
                     st.error("Login incorrecto, inténtalo de nuevo")
-        
+        col1, col2 = st.columns(2)        
         with col1:
             st.caption("¿Actualmente estás cursando un programa y quieres acceso?")
             st.link_button("Solicita acceso", f'{auth_url}')

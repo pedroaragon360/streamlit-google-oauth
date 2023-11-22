@@ -227,6 +227,7 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                             for steps in reversed(run_steps.data):
                                 if hasattr(steps.step_details, 'tool_calls'):
                                     with st.expander("Código generado por Code Interpreter"):
+                                        st.write(steps.step_details)
                                         st.code(steps.step_details.tool_calls[0].code_interpreter.input)
                                     
                     #if steps.tools[0].type == 'code_interpreter':
@@ -431,6 +432,7 @@ if hasattr(st.session_state.run, 'status'):
         st.session_state.retry_error += 1
         with st.chat_message('assistant'):
             if hasattr(st.session_state.run, 'last_error'):
+                st.toast("Error:" + st.session_state.run.last_error.message)
                 st.write("Atención: " + st.session_state.run.last_error.message)
             if st.session_state.retry_error < 3:
                 st.write("Intentándolo de nuevo ......")

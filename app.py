@@ -113,6 +113,7 @@ def main():
                         "pass": fpass
                     }
                     st.experimental_set_query_params(**params)
+                    st.toast("Login " + femail + " " + fpass)
                     st.session_state.authed = True
                     st.session_state.user_info = femail
                     #query_params = st.experimental_get_query_params()
@@ -122,10 +123,10 @@ def main():
         col1, col2 = st.columns(2)        
         with col1:
             st.caption("¿Actualmente estás cursando un programa y quieres acceso?")
-            st.link_button("Solicita acceso", f'{auth_url}')
+            st.link_button("Solicita acceso >", f'{auth_url}')
         with col2:
             st.caption("¿Eres docente o empleado?")
-            st.link_button("Acceso interno", f'{auth_url}', type="primary")
+            st.link_button("Acceso interno >", f'{auth_url}')
         st.stop()
     else:
         # # User is authenticated, show the content screen

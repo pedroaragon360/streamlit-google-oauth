@@ -223,7 +223,7 @@ if "assistant" not in st.session_state:
         raise
 
 # Display chat messages
-elif (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "completed") or st.session_state.preloadThread == True:
+if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "completed") or st.session_state.preloadThread == True:
 
     st.session_state.messages = client.beta.threads.messages.list(
         thread_id=st.session_state.thread.id

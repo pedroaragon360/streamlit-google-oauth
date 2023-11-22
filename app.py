@@ -228,7 +228,7 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                                 if hasattr(steps.step_details, 'tool_calls'):
                                     with st.expander("Código generado por Code Interpreter"):
                                         st.code(steps.step_details.tool_calls[0].code_interpreter.input)
-                                        st.markdown(steps.step_details.tool_calls[0].code_interpreter.outputs[0].logs) #fsafas
+                                        st.markdown(steps.step_details.tool_calls[0].code_interpreter.outputs[0].logs, unsafe_allow_html=True)
                                     
                     #if steps.tools[0].type == 'code_interpreter':
                         # Handle text content

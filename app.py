@@ -229,7 +229,7 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                                     with st.expander("Código generado por Code Interpreter"):
                                         st.code(steps.step_details.tool_calls[0].code_interpreter.input)
                                         st.subheader("Output del código")
-                                        st.text(steps.step_details.tool_calls[0].code_interpreter.outputs[0].logs.replace(r'\n', '').replace('\n', '<br>'))
+                                        st.text(steps.step_details.tool_calls[0].code_interpreter.outputs[0].logs)
                                     
                     #if steps.tools[0].type == 'code_interpreter':
                         # Handle text content

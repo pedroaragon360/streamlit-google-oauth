@@ -328,7 +328,7 @@ if uploaded_file is not None:
         if file_type == "text/csv":
             df = pd.read_csv(uploaded_file)
             df = df.iloc[:200, :15]
-            json_str = df.to_csv(orient='records', indent=4)
+            json_str = df.to_csv()
             file_stream = io.BytesIO(json_str.encode())
             file_type = 'text/csv'
             uploaded_file.name = 'file.csv'
@@ -336,7 +336,7 @@ if uploaded_file is not None:
         elif file_type in ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]:
             df = pd.read_excel(uploaded_file)
             df = df.iloc[:200, :15]
-            json_str = df.to_csv(orient='records', indent=4)
+            json_str = df.to_csv()
             file_stream = io.BytesIO(json_str.encode())
             file_type = 'text/csv'
             uploaded_file.name = 'file.csv'

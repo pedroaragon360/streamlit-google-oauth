@@ -467,7 +467,14 @@ if hasattr(st.session_state.run, 'status'):
             run_id=st.session_state.run.id,
         )
         run_steps_loading = client.beta.threads.runs.steps.list(thread_id=st.session_state.thread.id,run_id=st.session_state.run.id  )
-        st.write(run_steps_loading.data)
+        #st.write(run_steps_loading.data)
+        for steps_loading in reversed(run_steps_loading.data):
+            if hasattr(steps_loading.step_details, 'message_creation'):
+                messageid = steps_loading.step_details.message_creation[0].message_id                
+                message = client.beta.threads.messages.retrieve(message_id = messageid, thread_id=st.session_state.thread.id )
+                if hasattr(message.content, 'text'):
+                    st.write(message.content.text.value)
+                
         if st.session_state.retry_error < 3:
             time.sleep(3)
             st.rerun()

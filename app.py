@@ -475,6 +475,8 @@ if hasattr(st.session_state.run, 'status'):
                                 st.write(content_part.text.value)
                     st.toast("MSG recibido y guardado")
                     st.session_state.messages_progress.append(messageid)
+                    st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status == 'queued' else '', unsafe_allow_html=True)
+                    
                 
 
 

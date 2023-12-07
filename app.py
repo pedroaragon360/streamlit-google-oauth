@@ -241,7 +241,7 @@ if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "
                             for steps in reversed(run_steps.data):
                                 if hasattr(steps.step_details, 'tool_calls'):
                                     with st.expander("Código generado por Code Interpreter"):
-                                        st.code(steps.step_details.tool_calls)
+                                        st.write(steps.step_details)
                                         st.code(steps.step_details.tool_calls[0].code_interpreter.input)
                                         if "outputs" in steps.step_details.tool_calls[0].code_interpreter:
                                             st.subheader("Output del código")

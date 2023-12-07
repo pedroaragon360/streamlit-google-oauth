@@ -439,6 +439,7 @@ with tab5:
 # Handle run status
 if hasattr(st.session_state.run, 'status'):
     if st.session_state.run.status == "running":
+        st.toast("Running")
         with tab1:
             with st.chat_message('assistant'):
                 st.write("Thinking ......")
@@ -446,6 +447,7 @@ if hasattr(st.session_state.run, 'status'):
                 time.sleep(1)
                 st.rerun()
     elif st.session_state.run.status == "failed":
+        st.toast("Failed")
         st.session_state.retry_error += 1
         with st.chat_message('assistant'):
             if hasattr(st.session_state.run, 'last_error'):
@@ -459,6 +461,7 @@ if hasattr(st.session_state.run, 'status'):
                 st.error("Lo sentimos, no se ha podido procesar: " + st.session_state.run.last_error.message)
 
     elif st.session_state.run.status != "completed":
+        st.toast("Not completed")
         st.session_state.run = client.beta.threads.runs.retrieve(
             thread_id=st.session_state.thread.id,
             run_id=st.session_state.run.id,
@@ -466,3 +469,10 @@ if hasattr(st.session_state.run, 'status'):
         if st.session_state.retry_error < 3:
             time.sleep(3)
             st.rerun()
+else:
+    st.toast("No more status")
+    
+    
+                            #run_steps = client.beta.threads.runs.steps.list(thread_id=st.session_state.thread.id,run_id=message.run_id  )
+                            #st.write(run_steps.data)
+

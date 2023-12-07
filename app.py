@@ -241,7 +241,7 @@ if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "
                             for steps in reversed(run_steps.data):
                                 if hasattr(steps.step_details, 'tool_calls'):
                                     with st.expander("Código generado por Code Interpreter"):
-                                        st.write(steps.step_details)
+                                        #st.write(steps.step_details)
                                         st.code(steps.step_details.tool_calls[0].code_interpreter.input)
                                         if "outputs" in steps.step_details.tool_calls[0].code_interpreter:
                                             st.subheader("Output del código")
@@ -470,11 +470,15 @@ if hasattr(st.session_state.run, 'status'):
         #st.write(run_steps_loading.data)
         for steps_loading in reversed(run_steps_loading.data):
             if hasattr(steps_loading.step_details, 'message_creation'):
+                st.toast("Mensaje recibido de progreso!")
                 messageid = steps_loading.step_details.message_creation.message_id                
                 message = client.beta.threads.messages.retrieve(message_id = messageid, thread_id=st.session_state.thread.id )
-                if hasattr(message.content, 'text'):
-                    st.write(message.content.text.value)
-                
+                for content_part in message.content:
+                    if hasattr(content_part.content, 'text'):
+                        st.write(content_part.content.text.value)
+                    else:
+                        st.toast("No encontrado mensajito")
+                    
         if st.session_state.retry_error < 3:
             time.sleep(3)
             st.rerun()

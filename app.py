@@ -471,7 +471,8 @@ if hasattr(st.session_state.run, 'status'):
                     message = client.beta.threads.messages.retrieve(message_id = messageid, thread_id=st.session_state.thread.id )
                     for content_part in message.content:
                         if hasattr(content_part, 'text'):
-                            st.write(content_part.text.value)
+                            with st.chat_message('assistant'):
+                                st.write(content_part.text.value)
                     st.toast("MSG recibido y guardado")
                     st.session_state.messages_progress.append(messageid)
                 

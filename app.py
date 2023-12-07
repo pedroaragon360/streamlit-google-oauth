@@ -474,6 +474,7 @@ if hasattr(st.session_state.run, 'status'):
                             if hasattr(content_part, 'text'):
                                     st.write(content_part.text.value if st.session_state.run.status == 'queued' else '')
                         st.toast("¡Respuesta parcial recibida!")
+                        st.write(message)
                         st.session_state.messages_progress.append(messageid)
                         st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status == 'queued' else '', unsafe_allow_html=True)
                         

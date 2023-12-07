@@ -180,7 +180,8 @@ if "authed" not in st.session_state:
     st.session_state.authed = 1
 if "preloadThread" not in st.session_state:
     st.session_state.preloadThread = False
-
+if "messages_progress" not in st.session_state:
+    st.messages_progress = []
 # Set up the page
 #st.set_page_config(page_title="Asistente")
 
@@ -337,7 +338,7 @@ if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state
     st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status == 'queued' else '', unsafe_allow_html=True)
 
     if st.session_state.retry_error < 3:
-        time.sleep(1)
+        time.sleep(4)
         st.rerun()
         
 if uploaded_file is not None:
@@ -438,15 +439,8 @@ with tab5:
 
 # Handle run status
 if hasattr(st.session_state.run, 'status'):
-    if st.session_state.run.status == "running":
-        st.toast("Running")
-        with tab1:
-            with st.chat_message('assistant'):
-                st.write("Thinking ......")
-            if st.session_state.retry_error < 3:
-                time.sleep(1)
-                st.rerun()
-    elif st.session_state.run.status == "failed":
+
+    if st.session_state.run.status == "failed":
         st.toast("Failed")
         st.session_state.retry_error += 1
         with st.chat_message('assistant'):
@@ -455,7 +449,7 @@ if hasattr(st.session_state.run, 'status'):
                 st.write("Atención: " + st.session_state.run.last_error.message)
             if st.session_state.retry_error < 3:
                 st.write("Intentándolo de nuevo ......")
-                time.sleep(3)
+                time.sleep(4)
                 st.rerun()
             else:
                 st.error("Lo sentimos, no se ha podido procesar: " + st.session_state.run.last_error.message)
@@ -466,21 +460,26 @@ if hasattr(st.session_state.run, 'status'):
             thread_id=st.session_state.thread.id,
             run_id=st.session_state.run.id,
         )
+        
         run_steps_loading = client.beta.threads.runs.steps.list(thread_id=st.session_state.thread.id,run_id=st.session_state.run.id  )
         #st.write(run_steps_loading.data)
         for steps_loading in reversed(run_steps_loading.data):
             if hasattr(steps_loading.step_details, 'message_creation'):
                 st.toast("Mensaje recibido de progreso!")
-                messageid = steps_loading.step_details.message_creation.message_id                
-                message = client.beta.threads.messages.retrieve(message_id = messageid, thread_id=st.session_state.thread.id )
-                for content_part in message.content:
-                    if hasattr(content_part, 'text'):
-                        st.write(content_part.text.value)
-                    else:
-                        st.toast("No encontrado mensajito")
+                messageid = steps_loading.step_details.message_creation.message_id
+                if(messageid not in st.session_state.messages_progress){
+                    message = client.beta.threads.messages.retrieve(message_id = messageid, thread_id=st.session_state.thread.id )
+                    for content_part in message.content:
+                        if hasattr(content_part, 'text'):
+                            st.write(content_part.text.value)
+                    st.toast("MSG recibido y guardado")
+                    st.session_state.messages_progress.append(messageid)
+                }
+
+
                     
         if st.session_state.retry_error < 3:
-            time.sleep(3)
+            time.sleep(4)
             st.rerun()
 else:
     st.toast("No more status")

@@ -336,7 +336,7 @@ if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state
         assistant_id=st.session_state.assistant.id,
     )
     with st.chat_message('assistant'):
-        st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status == 'queued' else '', unsafe_allow_html=True)
+        st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status  in ['queued', 'in_progress'] else '', unsafe_allow_html=True)
 
     if st.session_state.retry_error < 3:
         time.sleep(4)
@@ -471,10 +471,10 @@ if hasattr(st.session_state.run, 'status'):
                     for content_part in message.content:
                         if hasattr(content_part, 'text'):
                             with st.chat_message('assistant'):
-                                st.write(content_part.text.value if st.session_state.run.status == 'queued' else '')
+                                st.write(content_part.text.value if st.session_state.run.status in ['queued', 'in_progress'] else '')
                     st.toast("¡Respuesta parcial recibida!" + st.session_state.run.status)
                     st.session_state.messages_progress.append(messageid)
-                    st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status == 'queued' else '', unsafe_allow_html=True)
+                    st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status in ['queued', 'in_progress'] else '', unsafe_allow_html=True)
                 
             
 

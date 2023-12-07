@@ -466,6 +466,8 @@ if hasattr(st.session_state.run, 'status'):
             thread_id=st.session_state.thread.id,
             run_id=st.session_state.run.id,
         )
+        run_steps_loading = client.beta.threads.runs.steps.list(thread_id=st.session_state.thread.id,run_id=st.session_state.run.id  )
+        st.write(run_steps_loading.data)
         if st.session_state.retry_error < 3:
             time.sleep(3)
             st.rerun()

@@ -335,7 +335,8 @@ if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state
         thread_id=st.session_state.thread.id,
         assistant_id=st.session_state.assistant.id,
     )
-    st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status == 'queued' else '', unsafe_allow_html=True)
+    with st.chat_message('assistant'):
+        st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status == 'queued' else '', unsafe_allow_html=True)
 
     if st.session_state.retry_error < 3:
         time.sleep(4)
@@ -475,7 +476,8 @@ if hasattr(st.session_state.run, 'status'):
                                 st.write(content_part.text.value if st.session_state.run.status == 'queued' else '')
                     st.toast("MSG recibido y guardado")
                     st.session_state.messages_progress.append(messageid)
-                    st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status == 'queued' else '', unsafe_allow_html=True)
+                    with st.chat_message('assistant'):
+                        st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status == 'queued' else '', unsafe_allow_html=True)
                     
                 
 

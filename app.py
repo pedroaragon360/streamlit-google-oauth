@@ -474,8 +474,8 @@ if hasattr(st.session_state.run, 'status'):
                 messageid = steps_loading.step_details.message_creation.message_id                
                 message = client.beta.threads.messages.retrieve(message_id = messageid, thread_id=st.session_state.thread.id )
                 for content_part in message.content:
-                    if hasattr(content_part.content, 'text'):
-                        st.write(content_part.content.text.value)
+                    if hasattr(content_part, 'text'):
+                        st.write(content_part.text.value)
                     else:
                         st.toast("No encontrado mensajito")
                     

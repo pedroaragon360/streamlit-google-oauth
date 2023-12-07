@@ -241,6 +241,7 @@ if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "
                             for steps in reversed(run_steps.data):
                                 if hasattr(steps.step_details, 'tool_calls'):
                                     with st.expander("Código generado por Code Interpreter"):
+                                        st.code(steps.step_details.tool_calls)
                                         st.code(steps.step_details.tool_calls[0].code_interpreter.input)
                                         if "outputs" in steps.step_details.tool_calls[0].code_interpreter:
                                             st.subheader("Output del código")
@@ -345,7 +346,7 @@ if uploaded_file is not None:
         if file_type == "text/csv":
             df = pd.read_csv(uploaded_file)
             df = df.iloc[:200, :15]
-            json_str = df.to_csv()
+            json_str = df.to_csv(index=False)
             file_stream = io.BytesIO(json_str.encode())
             file_type = 'text/csv'
             uploaded_file.name = 'file.csv'
@@ -353,7 +354,7 @@ if uploaded_file is not None:
         elif file_type in ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]:
             df = pd.read_excel(uploaded_file)
             df = df.iloc[:200, :15]
-            json_str = df.to_csv()
+            json_str = df.to_csv(index=False)
             file_stream = io.BytesIO(json_str.encode())
             file_type = 'text/csv'
             uploaded_file.name = 'file.csv'

@@ -473,7 +473,7 @@ if hasattr(st.session_state.run, 'status'):
                     for content_part in message.content:
                         if hasattr(content_part, 'text'):
                             st.session_state.messages_progress.append(content_part.text.value)
-                    st.toast("¡Respuesta parcial recibida!" + st.session_state.run.status)
+                    st.toast("¡Respuesta parcial recibida!" + content_part.text.value)
                     st.session_state.messages_progress_ids.append(messageid)
                     for message in st.session_state.messages_progress:
                         st.write(message)

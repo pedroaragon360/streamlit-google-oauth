@@ -441,7 +441,7 @@ with tab5:
             st.error("Failed to fetch FAQ data2")
 
 # Handle run status
-st.toast(st.session_state.run)
+st.write(st.session_state.run)
 if hasattr(st.session_state.run, 'status'):
     if st.session_state.run.status == "failed":
         st.toast("Failed")

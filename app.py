@@ -441,7 +441,7 @@ with tab5:
             st.error("Failed to fetch FAQ data2")
 
 # Handle run status
-st.write(st.session_state.run)
+    
 if hasattr(st.session_state.run, 'status'):
     if st.session_state.run.status == "failed":
         st.toast("Failed")
@@ -475,18 +475,16 @@ if hasattr(st.session_state.run, 'status'):
                             st.session_state.messages_progress.append(content_part.text.value)
                     st.toast("¡Respuesta parcial recibida!" + st.session_state.run.status)
                     st.session_state.messages_progress_ids.append(messageid)
-                    for message in st.session_state.messages_progress:
-                        st.write(message)
-                    st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status in ['queued', 'in_progress'] else '', unsafe_allow_html=True)
-                
-            
-
+                    with st.chat_message('assistant'):
+                        for message in st.session_state.messages_progress:
+                            st.write(message)
+                        st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status in ['queued', 'in_progress'] else '', unsafe_allow_html=True)
 
                     
         if st.session_state.retry_error < 3:
             time.sleep(4)
             st.rerun()
-    elif st.session_state.run.status != "completed":
+    elif st.session_state.run.status == "completed":
         st.toast("Completed!")
         st.session_state.messages_progress = []
             

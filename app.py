@@ -475,10 +475,9 @@ if hasattr(st.session_state.run, 'status'):
                             st.session_state.messages_progress.append(content_part.text.value)
                     st.toast("¡Respuesta parcial recibida!" + st.session_state.run.status)
                     st.session_state.messages_progress_ids.append(messageid)
-                    with st.chat_message('assistant'):
-                        for message in st.session_state.messages_progress:
-                            st.write(message)
-                        st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status in ['queued', 'in_progress'] else '', unsafe_allow_html=True)
+                    for message in st.session_state.messages_progress:
+                        st.write(message)
+                    st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status in ['queued', 'in_progress'] else '', unsafe_allow_html=True)
 
                     
         if st.session_state.retry_error < 3:

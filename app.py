@@ -458,7 +458,6 @@ if hasattr(st.session_state.run, 'status'):
                 st.error("Lo sentimos, no se ha podido procesar: " + st.session_state.run.last_error.message)
 
     elif st.session_state.run.status != "completed":
-        st.toast("Not completed")
         st.session_state.run = client.beta.threads.runs.retrieve(
             thread_id=st.session_state.thread.id,
             run_id=st.session_state.run.id,
@@ -474,18 +473,20 @@ if hasattr(st.session_state.run, 'status'):
                         if hasattr(content_part, 'text'):
                             st.session_state.messages_progress.append(content_part.text.value)
                     st.toast("¡Respuesta parcial recibida!")
-                    st.write(message)
+                    #st.write(message)
                     st.session_state.messages_progress_ids.append(messageid)
-                    for message in st.session_state.messages_progress:
-                        st.write(message)
-                    st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status in ['queued', 'in_progress'] else '', unsafe_allow_html=True)
+                    if len(st.session_state.messages_progress)>0:
+                        with st.chat_message('assistant'):
+                            for message in st.session_state.messages_progress:
+                                st.write(message)
+                            st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status in ['queued', 'in_progress'] else '', unsafe_allow_html=True)
 
                     
         if st.session_state.retry_error < 3:
             time.sleep(4)
             st.rerun()
     elif st.session_state.run.status == "completed":
-        st.toast("Completed!")
+        st.toast("¡Consulta completada!")
         st.session_state.messages_progress = []
             
 else:

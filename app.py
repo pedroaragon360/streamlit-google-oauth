@@ -486,6 +486,10 @@ if hasattr(st.session_state.run, 'status'):
         if st.session_state.retry_error < 3:
             time.sleep(4)
             st.rerun()
+    elif st.session_state.run.status != "completed":
+        st.toast("Completed!")
+        st.session_state.messages_progress = []
+            
 else:
     st.toast("No more status")
     

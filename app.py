@@ -180,6 +180,8 @@ if "authed" not in st.session_state:
     st.session_state.authed = 1
 if "preloadThread" not in st.session_state:
     st.session_state.preloadThread = False
+if "messages_progress_ids" not in st.session_state:
+    st.session_state.messages_progress_ids = []
 if "messages_progress" not in st.session_state:
     st.session_state.messages_progress = []
 # Set up the page
@@ -466,14 +468,15 @@ if hasattr(st.session_state.run, 'status'):
         for steps_loading in reversed(run_steps_loading.data):
             if hasattr(steps_loading.step_details, 'message_creation'):
                 messageid = steps_loading.step_details.message_creation.message_id
-                if messageid not in st.session_state.messages_progress:
+                if messageid not in st.session_state.messages_progress_ids:
                     message = client.beta.threads.messages.retrieve(message_id = messageid, thread_id=st.session_state.thread.id )
                     for content_part in message.content:
                         if hasattr(content_part, 'text'):
-                            with st.chat_message('assistant'):
-                                st.write(content_part.text.value if st.session_state.run.status in ['queued', 'in_progress'] else '')
+                            st.session_state.messages_progress.append(content_part.text.value)
                     st.toast("¡Respuesta parcial recibida!" + st.session_state.run.status)
-                    st.session_state.messages_progress.append(messageid)
+                    st.session_state.messages_progress_ids.append(messageid)
+                    for message in st.session_state.messages_progress:
+                        st.write(message)
                     st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status in ['queued', 'in_progress'] else '', unsafe_allow_html=True)
                 
             

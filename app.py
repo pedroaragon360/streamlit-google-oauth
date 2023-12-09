@@ -244,7 +244,7 @@ if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "
                             for steps in reversed(run_steps.data):
                                 if hasattr(steps.step_details, 'tool_calls'):
                                     with st.expander("Código generado por Code Interpreter"):
-                                        #st.write(steps.step_details)
+                                        st.write(steps.step_details)
                                         st.code(steps.step_details.tool_calls[0].code_interpreter.input)
                                         if "outputs" in steps.step_details.tool_calls[0].code_interpreter:
                                             st.subheader("Output del código")
@@ -471,7 +471,8 @@ if hasattr(st.session_state.run, 'status'):
                     message = client.beta.threads.messages.retrieve(message_id = messageid, thread_id=st.session_state.thread.id )
                     for content_part in message.content:
                         if hasattr(content_part, 'text'):
-                            st.session_state.messages_progress.append(content_part.text.value)
+                            if len(content_part.text.value)>2:
+                                st.session_state.messages_progress.append(content_part.text.value)
                     st.toast("¡Respuesta parcial recibida!")
                     #st.write(message)
                     st.session_state.messages_progress_ids.append(messageid)

@@ -113,7 +113,10 @@ def main():
         if checkAuth != "1":
             st.title("Subscripción no activa")
             st.write("No tienes acceso actualmente a esta aplicación. \n Si estás cursando un programa en estos momentos, solicita tu alta escribiendo a altagpt@thevalley.es")
+            st.toast("Stop!")
             st.stop()
+        else:
+            st.toast( st.session_state.user_info + " - " + checkAuth)
             
         #st.write(f"User info: {st.session_state.user_info}")
         # st.write("")

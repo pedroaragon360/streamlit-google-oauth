@@ -123,7 +123,7 @@ def main():
 
 
 # Run the app
-if __name__ == "__main__" and "authed" not in st.session_state:
+if "authed" not in st.session_state:
     main()
 
 

@@ -352,7 +352,6 @@ with tab5:
 
 
 # Handle run status
-    
 if hasattr(st.session_state.run, 'status'):
     if st.session_state.run.status == "failed":
         st.toast("Failed")

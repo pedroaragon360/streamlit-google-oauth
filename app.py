@@ -43,15 +43,16 @@ st.set_page_config(
     layout="wide")
 st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
 
+# Login
 def login(femail,fpass):
     if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
         st.session_state.authed = 1
         st.session_state.user_info = femail
-
 def authTHV(data):
     response = requests.post("https://thevalley.es/lms/gpt_app/auth.php", data=data)
     return response.text
-    
+
+# Login via URL    
 if 'email' in query_params and 'pass' in query_params:
     login(query_params["email"][0], query_params["pass"][0])
     st.session_state.user_email = query_params["email"][0]
@@ -69,23 +70,18 @@ def login_wall():
         st.markdown('<span style="display: block;font-size: 0.5em; ">Powered by <img src="https://thevalley.es/lms/gpt_app/logogpt.png" style="margin-left:0.2em" height="20"></span>', unsafe_allow_html=True)
         st.markdown("Bienvenido a la aplicación GPT-4 de OpenAI ofrecido por The Valley.\n Esta aplicación es gratuita para uso educativo.")
 
+        # Login form
         with st.form("login"):
-            #st.write("Soy Alumno")
             femail = st.text_input('Email', key='campoemail', value=st.session_state.user_email, autocomplete="on")
             fpass = st.text_input('Clave', key='campopass', type='password', value=st.session_state.user_pass, autocomplete="on")
-            # Every form must have a submit button.
             submitted = st.form_submit_button("Entrar  >",type = "primary")
             if submitted:
                 if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
-                    params = {
-                        "email": femail,
-                        "pass": fpass
-                    }
+                    params = {"email": femail,"pass": fpass}
                     st.experimental_set_query_params(**params)
                     st.toast("Login " + femail + " " + fpass)
                     st.session_state.authed = 1
                     st.session_state.user_info = femail
-                    #query_params = st.experimental_get_query_params()
                     st.rerun()
                 else:
                     st.error("Login incorrecto, inténtalo de nuevo")
@@ -103,12 +99,8 @@ def login_wall():
             st.stop()
         else:
             st.toast( st.session_state.user_info + " - " + checkAuth)
-            
-        #st.write(f"User info: {st.session_state.user_info}")
-        # st.write("")
 
-
-# Run the app
+# Require login
 if "authed" not in st.session_state:
     login_wall()
 
@@ -116,27 +108,13 @@ if "authed" not in st.session_state:
 def historial(data):    
     if data["id"] not in st.session_state.savedMessages:
         if data["role"] == 'assistant':
-            st.session_state["disabled"] = False
+            st.session_state["chat_disabled"] = False
         st.session_state.savedMessages.append(data["id"])
         response = requests.post("https://thevalley.es/lms/gpt_app/historial.php", data=data)
         
-
-def getThreads(data):
-    st.session_state.threads = json.loads(requests.post("https://thevalley.es/lms/gpt_app/threads.php", data=data).text)
-
 # MENU
 tab1, tab2, tab3, tab4, tab5 = st.tabs([":speech_balloon: Conversación", ":paperclip: Sube un fichero", "Historial", "Reportar error", "Preguntas frecuentes"])
 st.markdown('<style>[data-baseweb=tab-list] {   position: fixed !important; top: 0.5em;   left: 11em;   z-index: 9999999; } </style>', unsafe_allow_html=True)
-
-with tab1:
-    with st.chat_message('assistant'):
-        st.caption('Esta aplicación está disponible para uso educativo, úsalo con responsabilidad. Tu actividad queda guardada en "Historial".')
-        st.write('¡Hola! Soy el asistente GPT de The Valley. ¿cómo te puedo ayudar?')
-
-with tab2:
-    st.caption("Tamaño máximo 3MB. Formatos soportados: PDF, CSV, XLS, XLSX, JSON")
-    uploaded_file = st.file_uploader("", type=["csv", "xls", "json", "xlsx", "pdf"], key=f'file_uploader_{st.session_state.uploader_key}')
-
         
 # Initialize OpenAI assistant
 if "assistant" not in st.session_state:
@@ -155,6 +133,12 @@ if "assistant" not in st.session_state:
         st.warning(f"Error: {e}")
         historial({"user":st.session_state.user_info,"thread": '',"role": 'bug', "message": "Error inicializando el asisente: {e}", "id":''})
         raise
+
+# Chat Tab
+with tab1:
+    with st.chat_message('assistant'):
+        st.caption('Esta aplicación está disponible para uso educativo, úsalo con responsabilidad. Tu actividad queda guardada en "Historial".')
+        st.write('¡Hola! Soy el asistente GPT de The Valley. ¿cómo te puedo ayudar?')
 
 # Display chat messages
 if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "completed") or st.session_state.preloadThread == True:
@@ -234,17 +218,17 @@ if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "
 
                     
 
-if "disabled" not in st.session_state:
-    st.session_state["disabled"] = False
+if "chat_disabled" not in st.session_state:
+    st.session_state["chat_disabled"] = False
 
-def disable():
-    st.session_state["disabled"] = True
+def disable_chat():
+    st.session_state["chat_disabled"] = True
 
-if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state.disabled, on_submit =disable):
+#Show & execute prompt
+if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state.chat_disabled, on_submit =disable_chat):
     prompt_raw=prompt
     #prompt = prompt.replace("\n", "\n\n")
     if "file_id" in st.session_state and "file_name" in st.session_state:
-    #     prompt_raw = "Renombra el archivo " + str(st.session_state.file_id) + " por " + str(st.session_state.file_name) + ". " + prompt_raw
         prompt_raw = f"Acabo de subir el archivo {st.session_state.file_id} en formato {st.session_state.file_format}\n\n{prompt_raw}"
     message_data = {
         "thread_id": st.session_state.thread.id,
@@ -272,7 +256,11 @@ if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state
     if st.session_state.retry_error < 3:
         time.sleep(4)
         st.rerun()
-        
+
+# Subida de archivo        
+with tab2:
+    st.caption("Tamaño máximo 3MB. Formatos soportados: PDF, CSV, XLS, XLSX, JSON")
+    uploaded_file = st.file_uploader("", type=["csv", "xls", "json", "xlsx", "pdf"], key=f'file_uploader_{st.session_state.uploader_key}')
 if uploaded_file is not None:
     file_type = uploaded_file.type
     try:
@@ -300,16 +288,16 @@ if uploaded_file is not None:
             
         file_response = client.files.create(file=file_stream, purpose='assistants')
 
-        # file_stream = uploaded_file.getvalue()
-        # file_response = client.files.create(file=file_stream, purpose='assistants')
         st.session_state.file_id = file_response.id
         st.session_state.file_format = file_type
         st.session_state.file_name = uploaded_file.name
+        
         with tab2:
             st.success(f"Archivo subido. File ID: {file_response.id}")
-            historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": 'user', "message": f"Archivo subido: {uploaded_file.name} ID: {file_response.id}", "id": file_response.id})
+        historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": 'user', "message": f"Archivo subido: {uploaded_file.name} ID: {file_response.id}", "id": file_response.id})
         # Determine MIME type
         mime_type, _ = mimetypes.guess_type(uploaded_file.name)
+        
         if mime_type is None:
             mime_type = "application/octet-stream"  # Default for unknown types
     
@@ -328,46 +316,40 @@ if uploaded_file is not None:
     except Exception as e:
         st.error(f"An error occurred: {e}")
                 
+# Historial
+def getThreads(data):
+    st.session_state.threads = json.loads(requests.post("https://thevalley.es/lms/gpt_app/threads.php", data=data).text)
 with tab3: 
-    # Parse the JSON string to a Python list
     getThreads({"user":st.session_state.user_info})
-    # Iterate over the list and display each thread
     if 'threads' in st.session_state and st.session_state.threads:
         for fecha, thread in st.session_state.threads.items():
             st.link_button(":speech_balloon: Conversación " + str(fecha), "https://thevalley.es/lms/gpt_app/thread_"+str(thread),  use_container_width=True)
 
+# Feedback
 def handle_submission(input_value):
-    # Process the input value here
     historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": 'bug', "message": input_value, "id": input_value})
     st.success("¡Gracias! Feedback enviado")
-
 with tab4:
-    # Create a text input box
     st.title("¿Algún problema? Envíanos tu feedback")
     input_text = st.text_input("¿Qué problema has tenido en esta conversación?")
     submit_button = st.button("Dar feedback >")
     if submit_button:
         handle_submission(input_text)
         
-
+# FAQ
 with tab5:
     if "faq" not in st.session_state:
-        response = requests.get("https://thevalley.es/lms/gpt_app/faq.php")
-        
-        # Convert response to JSON
+        response = requests.get("https://thevalley.es/lms/gpt_app/faq.php")        
         if response.status_code == 200:
-            faq_data = response.json()  # Convert to Python object (list of lists)
-            
-            # Store in session state
+            faq_data = response.json()
             st.session_state.faq = faq_data
-
-            # Iterate over each question-answer pair
             for item in faq_data:
                 question, answer = item
                 with st.expander(f"**{question}**"):
                     st.markdown(answer)
         else:
             st.error("Failed to fetch FAQ data2")
+
 
 # Handle run status
     

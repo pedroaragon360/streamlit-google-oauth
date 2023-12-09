@@ -99,13 +99,10 @@ def main():
                     st.rerun()
                 else:
                     st.error("Login incorrecto, inténtalo de nuevo")
-        col1, col2 = st.columns(2)        
-        with col1:
-            st.caption("¿Actualmente estás cursando un programa y quieres acceso?")
-            st.link_button("Solicita acceso >", f'{auth_url}')
-        with col2:
-            st.caption("¿Eres docente o empleado?")
-            st.link_button("Acceso interno >", f'{auth_url}')
+        # col1, col2 = st.columns(2)        
+        # with col1:
+        #     st.caption("¿Actualmente estás cursando un programa y quieres acceso?")
+        #     st.link_button("Solicita acceso >", f'{auth_url}')
         st.stop()
     else:
         checkAuth = authTHV({"user":st.session_state.user_info})

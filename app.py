@@ -1,9 +1,6 @@
 import streamlit as st
-from google_auth_oauthlib.flow import Flow
-from google.oauth2.credentials import Credentials
 import requests
 import json  # Import the json module
-
 import openai
 import uuid
 import time
@@ -14,9 +11,12 @@ import base64
 from openai import OpenAI
 import mimetypes
 
+query_params = st.experimental_get_query_params()
+
 # Initialize OpenAI client
 client = OpenAI()
 
+# Define state variables
 default_values = {
     "user_email": None,
     "user_pass": None,
@@ -36,13 +36,14 @@ for attr, default in default_values.items():
         setattr(st.session_state, attr, default)
         
         
-
+# Page config
 st.set_page_config(
     page_title="The Valley ChatGPT",
     page_icon="",
     layout="wide")
 st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
 
+# Functions
 def historial(data):    
     if data["id"] not in st.session_state.savedMessages:
         if data["role"] == 'assistant':
@@ -56,66 +57,26 @@ def authTHV(data):
 def getThreads(data):
     st.session_state.threads = json.loads(requests.post("https://thevalley.es/lms/gpt_app/threads.php", data=data).text)
     
-st.markdown('<div id="logoth" style="z-index: 9999999; background: url(https://thevalley.es/lms/gpt_app/logow.png);  width: 200px;  height: 27px;  position: fixed;  background-repeat: no-repeat;  background-size: auto 100%;  top: 1.1em;  left: 1em;"></div>', unsafe_allow_html=True)
-
-# Define the OAuth2 scopes
-SCOPES = [
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-    'openid'  # Include the 'openid' scope
-]
-
-
 def login(femail,fpass):
     if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
         st.session_state.authed = 1
         st.session_state.user_info = femail
 
-query_params = st.experimental_get_query_params()
 if 'email' in query_params and 'pass' in query_params:
     login(query_params["email"][0], query_params["pass"][0])
     st.session_state.user_email = query_params["email"][0]
     st.session_state.user_pass = query_params["pass"][0]
-    
-# Function to initialize the flow object with client ID and secret from Streamlit secrets
-def init_flow():
-    return Flow.from_client_config(
-        client_config={
-            "web": {
-                "client_id": st.secrets['GOOGLE_CLIENT_ID'],
-                "client_secret": st.secrets['GOOGLE_CLIENT_SECRET'],
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token",
-                "redirect_uris": [st.secrets['REDIRECT_URI']],
-                "scopes": SCOPES
-            }
-        },
-        scopes=SCOPES,
-        redirect_uri=st.secrets['REDIRECT_URI']
-    )
+
+st.markdown('<div id="logoth" style="z-index: 9999999; background: url(https://thevalley.es/lms/gpt_app/logow.png);  width: 200px;  height: 27px;  position: fixed;  background-repeat: no-repeat;  background-size: auto 100%;  top: 1.1em;  left: 1em;"></div>', unsafe_allow_html=True)
 
 # Streamlit app layout
 def main():
-    flow = init_flow()
 
-    # Check for the code parameter in the URL query parameters
-    query_params = st.experimental_get_query_params()
-    if 'code' in query_params:
-        try:
-            # Complete the authentication process
-            flow.fetch_token(code=query_params['code'][0])
-            credentials = flow.credentials
-            st.session_state['credentials'] = credentials.to_json()
-        except Exception as e:
-            # Handle exceptions and display an error message or redirect to login
-            st.error("Vuelve a iniciar sesión")
-            
     if 'credentials' not in st.session_state:
-        # Display login screen
+        # Login screen
         st.title("The Valley ChatGPT")
         st.markdown('<span style="display: block;font-size: 0.5em; ">Powered by <img src="https://thevalley.es/lms/gpt_app/logogpt.png" style="margin-left:0.2em" height="20"></span>', unsafe_allow_html=True)
         st.markdown("Bienvenido a la aplicación GPT-4 de OpenAI ofrecido por The Valley.\n Esta aplicación es gratuita para uso educativo.")
-        auth_url, _ = flow.authorization_url(prompt='consent')
 
 
         with st.form("login"):
@@ -147,19 +108,6 @@ def main():
             st.link_button("Acceso interno >", f'{auth_url}')
         st.stop()
     else:
-        # # User is authenticated, show the content screen
-        # st.title("Welcome to the App")
-        # # Convert JSON string back to dictionary
-        credentials_dict = json.loads(st.session_state['credentials'])
-        credentials = Credentials.from_authorized_user_info(credentials_dict)
-        
-        # Make a request to Google's user info endpoint
-        userinfo_response = requests.get(
-            'https://www.googleapis.com/oauth2/v3/userinfo',
-            headers={'Authorization': f'Bearer {credentials.token}'}
-        )
-        
-        st.session_state.user_info = userinfo_response.json().get('email', '-')
         checkAuth = authTHV({"user":st.session_state.user_info})
         if checkAuth != "1":
             st.title("Subscripción no activa")

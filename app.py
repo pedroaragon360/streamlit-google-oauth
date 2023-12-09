@@ -26,7 +26,6 @@ default_values = {
     "messages": [],
     "savedMessages": [],
     "retry_error": 0,
-    "authed": 1,
     "preloadThread": False,
     "messages_progress_ids": [],
     "messages_progress": [],
@@ -94,7 +93,7 @@ def main():
                     }
                     st.experimental_set_query_params(**params)
                     st.toast("Login " + femail + " " + fpass)
-                    st.session_state.authed = True
+                    st.session_state.authed = 1
                     st.session_state.user_info = femail
                     #query_params = st.experimental_get_query_params()
                     st.rerun()

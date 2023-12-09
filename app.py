@@ -240,11 +240,11 @@ if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "
                     for content_part in message.content:
                         if message.role == 'assistant':
                             run_steps = client.beta.threads.runs.steps.list(thread_id=st.session_state.thread.id,run_id=message.run_id  )
-                            #st.write(run_steps.data)
+                            st.write(run_steps.data)
                             for steps in reversed(run_steps.data):
                                 if hasattr(steps.step_details, 'tool_calls'):
                                     with st.expander("Código generado por Code Interpreter"):
-                                        st.write(steps.step_details)
+                                        #st.write(steps.step_details)
                                         st.code(steps.step_details.tool_calls[0].code_interpreter.input)
                                         if "outputs" in steps.step_details.tool_calls[0].code_interpreter:
                                             st.subheader("Output del código")

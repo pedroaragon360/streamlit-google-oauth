@@ -20,6 +20,7 @@ client = OpenAI()
 default_values = {
     "user_email": None,
     "user_pass": None,
+    "user_info": None,
     "session_id": str(uuid.uuid4()),
     "run": {"status": None},
     "messages": [],

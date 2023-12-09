@@ -43,41 +43,31 @@ st.set_page_config(
     layout="wide")
 st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
 
-# Functions
-def historial(data):    
-    if data["id"] not in st.session_state.savedMessages:
-        if data["role"] == 'assistant':
-            st.session_state["disabled"] = False
-        st.session_state.savedMessages.append(data["id"])
-        response = requests.post("https://thevalley.es/lms/gpt_app/historial.php", data=data)
-        
-def authTHV(data):
-    response = requests.post("https://thevalley.es/lms/gpt_app/auth.php", data=data)
-    return response.text
-def getThreads(data):
-    st.session_state.threads = json.loads(requests.post("https://thevalley.es/lms/gpt_app/threads.php", data=data).text)
-    
 def login(femail,fpass):
     if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
         st.session_state.authed = 1
         st.session_state.user_info = femail
 
+def authTHV(data):
+    response = requests.post("https://thevalley.es/lms/gpt_app/auth.php", data=data)
+    return response.text
+    
 if 'email' in query_params and 'pass' in query_params:
     login(query_params["email"][0], query_params["pass"][0])
     st.session_state.user_email = query_params["email"][0]
     st.session_state.user_pass = query_params["pass"][0]
 
+# Header
 st.markdown('<div id="logoth" style="z-index: 9999999; background: url(https://thevalley.es/lms/gpt_app/logow.png);  width: 200px;  height: 27px;  position: fixed;  background-repeat: no-repeat;  background-size: auto 100%;  top: 1.1em;  left: 1em;"></div>', unsafe_allow_html=True)
 
 # Streamlit app layout
-def main():
+def login_wall():
 
     if 'credentials' not in st.session_state:
         # Login screen
         st.title("The Valley ChatGPT")
         st.markdown('<span style="display: block;font-size: 0.5em; ">Powered by <img src="https://thevalley.es/lms/gpt_app/logogpt.png" style="margin-left:0.2em" height="20"></span>', unsafe_allow_html=True)
         st.markdown("Bienvenido a la aplicación GPT-4 de OpenAI ofrecido por The Valley.\n Esta aplicación es gratuita para uso educativo.")
-
 
         with st.form("login"):
             #st.write("Soy Alumno")
@@ -120,29 +110,33 @@ def main():
 
 # Run the app
 if "authed" not in st.session_state:
-    main()
+    login_wall()
 
+# Functions
+def historial(data):    
+    if data["id"] not in st.session_state.savedMessages:
+        if data["role"] == 'assistant':
+            st.session_state["disabled"] = False
+        st.session_state.savedMessages.append(data["id"])
+        response = requests.post("https://thevalley.es/lms/gpt_app/historial.php", data=data)
+        
 
-# Set up the page
-#st.set_page_config(page_title="Asistente")
+def getThreads(data):
+    st.session_state.threads = json.loads(requests.post("https://thevalley.es/lms/gpt_app/threads.php", data=data).text)
 
-
-#st.sidebar.markdown("Por Pedro Aragón", unsafe_allow_html=True)
-
+# MENU
 tab1, tab2, tab3, tab4, tab5 = st.tabs([":speech_balloon: Conversación", ":paperclip: Sube un fichero", "Historial", "Reportar error", "Preguntas frecuentes"])
-
 st.markdown('<style>[data-baseweb=tab-list] {   position: fixed !important; top: 0.5em;   left: 11em;   z-index: 9999999; } </style>', unsafe_allow_html=True)
-
-
-# File uploader for CSV, XLS, XLSX
-with tab2:
-    st.caption("Tamaño máximo 3MB. Formatos soportados: PDF, CSV, XLS, XLSX, JSON")
-    uploaded_file = st.file_uploader("", type=["csv", "xls", "json", "xlsx", "pdf"], key=f'file_uploader_{st.session_state.uploader_key}')
 
 with tab1:
     with st.chat_message('assistant'):
         st.caption('Esta aplicación está disponible para uso educativo, úsalo con responsabilidad. Tu actividad queda guardada en "Historial".')
         st.write('¡Hola! Soy el asistente GPT de The Valley. ¿cómo te puedo ayudar?')
+
+with tab2:
+    st.caption("Tamaño máximo 3MB. Formatos soportados: PDF, CSV, XLS, XLSX, JSON")
+    uploaded_file = st.file_uploader("", type=["csv", "xls", "json", "xlsx", "pdf"], key=f'file_uploader_{st.session_state.uploader_key}')
+
         
 # Initialize OpenAI assistant
 if "assistant" not in st.session_state:
@@ -158,9 +152,8 @@ if "assistant" not in st.session_state:
                 metadata={'session_id': st.session_state.session_id}
             )
     except Exception as e:
-        # Handling the error
         st.warning(f"Error: {e}")
-        # Optionally, re-raise the error if you want to propagate it further
+        historial({"user":st.session_state.user_info,"thread": '',"role": 'bug', "message": "Error inicializando el asisente: {e}", "id":''})
         raise
 
 # Display chat messages

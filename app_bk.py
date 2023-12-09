@@ -14,29 +14,11 @@ import base64
 from openai import OpenAI
 import mimetypes
 
-# Initialize OpenAI client
-client = OpenAI()
-
-default_values = {
-    "user_email": None,
-    "user_pass": None,
-    "session_id": str(uuid.uuid4()),
-    "run": {"status": None},
-    "messages": [],
-    "savedMessages": [],
-    "retry_error": 0,
-    "authed": 1,
-    "preloadThread": False,
-    "messages_progress_ids": [],
-    "messages_progress": [],
-    "uploader_key": 0
-}
-for attr, default in default_values.items():
-    if not hasattr(st.session_state, attr):
-        setattr(st.session_state, attr, default)
-        
-        
-
+if "user_email" not in st.session_state:
+    st.session_state.user_email = None
+if "user_pass" not in st.session_state:
+    st.session_state.user_pass = None
+    
 st.set_page_config(
     page_title="The Valley ChatGPT",
     page_icon="",
@@ -175,6 +157,33 @@ if __name__ == "__main__" and "authed" not in st.session_state:
     main()
 
 
+# Initialize OpenAI client
+client = OpenAI()
+
+# Your chosen model
+MODEL = "gpt-4-1106-preview"
+
+# Initialize session state variables
+if "session_id" not in st.session_state:
+    st.session_state.session_id = str(uuid.uuid4())
+if "run" not in st.session_state:
+    st.session_state.run = {"status": None}
+# if "currentChatRole" not in st.session_state: # evitamos mostrar varias veces el rol cuando se reciben varios mensajes 
+#     st.session_state.currentChatRole = 'user' 
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+if "savedMessages" not in st.session_state:
+    st.session_state.savedMessages = []
+if "retry_error" not in st.session_state:
+    st.session_state.retry_error = 0
+if "authed" not in st.session_state:
+    st.session_state.authed = 1
+if "preloadThread" not in st.session_state:
+    st.session_state.preloadThread = False
+if "messages_progress_ids" not in st.session_state:
+    st.session_state.messages_progress_ids = []
+if "messages_progress" not in st.session_state:
+    st.session_state.messages_progress = []
 # Set up the page
 #st.set_page_config(page_title="Asistente")
 
@@ -185,6 +194,9 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([":speech_balloon: Conversación", ":pape
 
 st.markdown('<style>[data-baseweb=tab-list] {   position: fixed !important; top: 0.5em;   left: 11em;   z-index: 9999999; } </style>', unsafe_allow_html=True)
 
+# Initialize session state for the uploader key
+if 'uploader_key' not in st.session_state:
+    st.session_state.uploader_key = 0
 
 # File uploader for CSV, XLS, XLSX
 with tab2:

@@ -266,7 +266,7 @@ if uploaded_file is not None:
     try:
         if file_type == "text/csv":
             df = pd.read_csv(uploaded_file)
-            df = df.iloc[:200, :15]
+            df = df.iloc[:200, :200]
             json_str = df.to_csv(index=False)
             file_stream = io.BytesIO(json_str.encode())
             file_type = 'text/csv'

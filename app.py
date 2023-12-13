@@ -376,11 +376,12 @@ if hasattr(st.session_state.run, 'status'):
         run_steps_loading = client.beta.threads.runs.steps.list(thread_id=st.session_state.thread.id,run_id=st.session_state.run.id  )
         for steps_loading in reversed(run_steps_loading.data):
             if hasattr(steps_loading.step_details, 'tool_calls'):
-                with st.expander("Código generado por Code Interpreter"):
-                    st.code(steps_loading.step_details.tool_calls[0].code_interpreter.input)
-                    if "outputs" in steps_loading.step_details.tool_calls[0].code_interpreter:
-                        st.subheader("Output del código")
-                        st.text(steps_loading.step_details.tool_calls[0].code_interpreter.outputs[0].logs)
+                with st.chat_message('assistant'):
+                    with st.expander("Código generado por Code Interpreter"):
+                        st.code(steps_loading.step_details.tool_calls[0])
+                        if "outputs" in steps_loading.step_details.tool_calls[0].code_interpreter:
+                            st.subheader("Output del código")
+                            st.text(steps_loading.step_details.tool_calls[0].code_interpreter.outputs[0].logs)
             if hasattr(steps_loading.step_details, 'message_creation'):
                 messageid = steps_loading.step_details.message_creation.message_id
                 if messageid not in st.session_state.messages_progress_ids:

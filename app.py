@@ -10,6 +10,10 @@ import re
 import base64
 from openai import OpenAI
 import mimetypes
+import os
+
+openai_apikey = os.getenv('OPENAI_API_KEY')
+openai_assistant = os.getenv('OPENAI_ASSISTANT')
 
 query_params = st.experimental_get_query_params()
 
@@ -118,9 +122,9 @@ st.markdown('<style>[data-baseweb=tab-list] {   position: fixed !important; top:
         
 # Initialize OpenAI assistant
 if "assistant" not in st.session_state:
-    openai.api_key = st.secrets["OPENAI_API_KEY"]
+    openai.api_key = openai_apikey
     try:
-        st.session_state.assistant = openai.beta.assistants.retrieve(st.secrets["OPENAI_ASSISTANT"])
+        st.session_state.assistant = openai.beta.assistants.retrieve(openai_assistant)
         # Your code that might raise an error
         if "thread_id" in query_params:
             st.session_state.thread = client.beta.threads.retrieve(query_params["thread_id"][0])    
@@ -257,7 +261,8 @@ if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state
         time.sleep(4)
         st.rerun()
 
-# Subida de archivo        
+# Subida de archivo   
+     
 with tab2:
     st.caption("Tamaño máximo 3MB. Formatos soportados: PDF, CSV, XLS, XLSX, JSON")
     uploaded_file = st.file_uploader("", type=["csv", "xls", "json", "xlsx", "pdf"], key=f'file_uploader_{st.session_state.uploader_key}')

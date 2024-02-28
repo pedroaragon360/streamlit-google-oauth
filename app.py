@@ -25,7 +25,7 @@ st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allo
 openai_apikey = os.getenv('OPENAI_API_KEY')
 openai_assistant = os.getenv('OPENAI_ASSISTANT')
 
-query_params = st.get_query_params()
+query_params = st.query_params()
 
 # Initialize OpenAI client
 client = OpenAI()

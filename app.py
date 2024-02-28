@@ -12,6 +12,8 @@ from openai import OpenAI
 import mimetypes
 import os
 
+
+
 openai_apikey = os.getenv('OPENAI_API_KEY')
 openai_assistant = os.getenv('OPENAI_ASSISTANT')
 

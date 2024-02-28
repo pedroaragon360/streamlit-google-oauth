@@ -13,6 +13,14 @@ import mimetypes
 import os
 
 
+# Page config
+st.set_page_config(
+    page_title="The Valley ChatGPT",
+    page_icon="",
+    layout="wide")
+st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
+
+
 
 openai_apikey = os.getenv('OPENAI_API_KEY')
 openai_assistant = os.getenv('OPENAI_ASSISTANT')
@@ -42,12 +50,6 @@ for attr, default in default_values.items():
         setattr(st.session_state, attr, default)
         
         
-# Page config
-st.set_page_config(
-    page_title="The Valley ChatGPT",
-    page_icon="",
-    layout="wide")
-st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
 
 # Login
 def login(femail,fpass):

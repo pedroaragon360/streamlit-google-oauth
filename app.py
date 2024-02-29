@@ -14,10 +14,7 @@ import os
 
 
 # Page config
-st.set_page_config(
-    page_title="The Valley ChatGPT",
-    page_icon="",
-    layout="wide")
+#st.set_page_config(    page_title="The Valley ChatGPT",    page_icon="",     layout="wide")
 st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
 
 

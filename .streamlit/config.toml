@@ -3,3 +3,5 @@ base="dark"
 primaryColor="#de147d"
 [server]
 maxUploadSize = 3
+enableCORS = false
+enableXsrfProtection = false

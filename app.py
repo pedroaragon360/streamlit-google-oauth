@@ -86,7 +86,7 @@ def login_wall():
             if submitted:
                 if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
                     params = {"email": femail,"pass": fpass}
-                    st.experimental_set_st.query_params(**params)
+#                    st.experimental_set_st.query_params(**params)
                     st.toast("Login " + femail + " " + fpass)
                     st.session_state.authed = 1
                     st.session_state.user_info = femail

@@ -62,9 +62,9 @@ def authTHV(data):
 
 # Login via URL    
 if 'email' in st.query_params and 'pass' in st.query_params:
-    login(st.query_params["email"][0], st.query_params["pass"][0])
-    st.session_state.user_email = st.query_params["email"][0]
-    st.session_state.user_pass = st.query_params["pass"][0]
+    login(st.query_params["email"][0], st.query_params["pass"])
+    st.session_state.user_email = st.query_params["email"]
+    st.session_state.user_pass = st.query_params["pass"]
 
 # Header
 st.markdown('<div id="logoth" style="z-index: 9999999; background: url(https://thevalley.es/lms/gpt_app/logow.png);  width: 200px;  height: 27px;  position: fixed;  background-repeat: no-repeat;  background-size: auto 100%;  top: 1.1em;  left: 1em;"></div>', unsafe_allow_html=True)
@@ -131,7 +131,7 @@ if "assistant" not in st.session_state:
         st.session_state.assistant = openai.beta.assistants.retrieve(openai_assistant)
         # Your code that might raise an error
         if "thread_id" in st.query_params:
-            st.session_state.thread = client.beta.threads.retrieve(st.query_params["thread_id"][0])    
+            st.session_state.thread = client.beta.threads.retrieve(st.query_params["thread_id"])    
             st.session_state.preloadThread = True
         else:
             st.session_state.thread = client.beta.threads.create(

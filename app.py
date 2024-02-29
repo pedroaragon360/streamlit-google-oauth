@@ -62,7 +62,7 @@ def authTHV(data):
 
 # Login via URL    
 if 'email' in st.query_params and 'pass' in st.query_params:
-    login(st.query_params["email"][0], st.query_params["pass"])
+    login(st.query_params["email"], st.query_params["pass"])
     st.session_state.user_email = st.query_params["email"]
     st.session_state.user_pass = st.query_params["pass"]
 
@@ -86,7 +86,7 @@ def login_wall():
             if submitted:
                 if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
                     params = {"email": femail,"pass": fpass}
-#                    st.experimental_set_st.query_params(**params)
+                    st.experimental_set_st.query_params(**params)
                     st.toast("Login " + femail + " " + fpass)
                     st.session_state.authed = 1
                     st.session_state.user_info = femail

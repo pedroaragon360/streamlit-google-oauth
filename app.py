@@ -25,7 +25,7 @@ st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allo
 openai_apikey = os.getenv('OPENAI_API_KEY')
 openai_assistant = os.getenv('OPENAI_ASSISTANT')
 
-query_params = st.experimental_get_query_params()
+#st.query_params = st.st.query_params
 
 # Initialize OpenAI client
 client = OpenAI()
@@ -61,10 +61,10 @@ def authTHV(data):
     return response.text
 
 # Login via URL    
-if 'email' in query_params and 'pass' in query_params:
-    login(query_params["email"][0], query_params["pass"][0])
-    st.session_state.user_email = query_params["email"][0]
-    st.session_state.user_pass = query_params["pass"][0]
+if 'email' in st.query_params and 'pass' in st.query_params:
+    login(st.query_params["email"][0], st.query_params["pass"][0])
+    st.session_state.user_email = st.query_params["email"][0]
+    st.session_state.user_pass = st.query_params["pass"][0]
 
 # Header
 st.markdown('<div id="logoth" style="z-index: 9999999; background: url(https://thevalley.es/lms/gpt_app/logow.png);  width: 200px;  height: 27px;  position: fixed;  background-repeat: no-repeat;  background-size: auto 100%;  top: 1.1em;  left: 1em;"></div>', unsafe_allow_html=True)
@@ -86,7 +86,7 @@ def login_wall():
             if submitted:
                 if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
                     params = {"email": femail,"pass": fpass}
-                    st.experimental_set_query_params(**params)
+                    st.experimental_set_st.query_params(**params)
                     st.toast("Login " + femail + " " + fpass)
                     st.session_state.authed = 1
                     st.session_state.user_info = femail
@@ -130,8 +130,8 @@ if "assistant" not in st.session_state:
     try:
         st.session_state.assistant = openai.beta.assistants.retrieve(openai_assistant)
         # Your code that might raise an error
-        if "thread_id" in query_params:
-            st.session_state.thread = client.beta.threads.retrieve(query_params["thread_id"][0])    
+        if "thread_id" in st.query_params:
+            st.session_state.thread = client.beta.threads.retrieve(st.query_params["thread_id"][0])    
             st.session_state.preloadThread = True
         else:
             st.session_state.thread = client.beta.threads.create(

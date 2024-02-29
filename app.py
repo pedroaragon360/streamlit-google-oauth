@@ -67,7 +67,7 @@ if 'email' in st.query_params and 'pass' in st.query_params:
     st.session_state.user_pass = st.query_params["pass"]
 
 # Header
-st.markdown('<div id="logoth" style="z-index: 9999999; background: url(https://thevalley.es/lms/gpt_app/logow.png);  width: 200px;  height: 27px;  position: fixed;  background-repeat: no-repeat;  background-size: auto 100%;  top: 1.1em;  left: 1em;"></div>', unsafe_allow_html=True)
+st.markdown('<div id="logoth" style="z-index: 9999999; background: url(https://thevalley.es/lms/i/logotipo.png);  width: 50px;  height: 27px;  position: fixed;  background-repeat: no-repeat;  background-size: auto 100%;  top: 1.1em;  left: 1em;"></div>', unsafe_allow_html=True)
 
 # Streamlit app layout
 def login_wall():
@@ -121,8 +121,8 @@ def historial(data):
         response = requests.post("https://thevalley.es/lms/gpt_app/historial.php", data=data)
         
 # MENU
-tab1, tab2, tab3, tab4, tab5 = st.tabs([":speech_balloon: Conversación", ":paperclip: Sube un fichero", "Historial", "Reportar error", "Preguntas frecuentes"])
-st.markdown('<style>[data-baseweb=tab-list] {   position: fixed !important; top: 0.5em;   left: 11em;   z-index: 9999999; } </style>', unsafe_allow_html=True)
+tab1, tab2, tab3, tab4, tab5 = st.tabs([":speech_balloon: Chat", ":paperclip: Subir", "Historial", "Reportar error", "¿Preguntas?"])
+st.markdown('<style>[data-baseweb=tab-list] {   position: fixed !important; top: 0.5em;   left: 5em;   z-index: 9999999; } </style>', unsafe_allow_html=True)
         
 # Initialize OpenAI assistant
 if "assistant" not in st.session_state:

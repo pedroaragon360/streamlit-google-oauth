@@ -14,8 +14,8 @@ import os
 
 
 # Page config
-#st.set_page_config(    page_title="The Valley ChatGPT",    page_icon="",     layout="wide")
-st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
+st.set_page_config(    page_title="The Valley ChatGPT",    page_icon="",     layout="wide")
+#st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
 
 
 
@@ -47,7 +47,8 @@ for attr, default in default_values.items():
         setattr(st.session_state, attr, default)
         
         
-
+def reloadPage():
+    st.rerun()
 # Login
 def login(femail,fpass):
     if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
@@ -66,12 +67,14 @@ if 'email' in st.query_params and 'pass' in st.query_params:
 # Header
 st.markdown('<div id="logoth" style="z-index: 9999999; background: url(https://thevalley.es/lms/i/logotipo.png);  width: 50px;  height: 27px;  position: fixed;  background-repeat: no-repeat;  background-size: auto 100%;  top: 1.1em;  left: 1em;"></div>', unsafe_allow_html=True)
 
+
+    
 # Streamlit app layout
 def login_wall():
 
     if 'credentials' not in st.session_state:
         # Login screen
-        st.title("The Valley ChatGPT")
+        st.title("2The Valley ChatGPT")
         st.markdown('<span style="display: block;font-size: 0.5em; ">Powered by <img src="https://thevalley.es/lms/gpt_app/logogpt.png" style="margin-left:0.2em" height="20"></span>', unsafe_allow_html=True)
         st.markdown("Bienvenido a la aplicación GPT-4 de OpenAI ofrecido por The Valley.\n Esta aplicación es gratuita para uso educativo.")
 
@@ -125,16 +128,20 @@ st.markdown('<style>[data-baseweb=tab-list] {   position: fixed !important; top:
 if "assistant" not in st.session_state:
     openai.api_key = openai_apikey
     try:
+        st.toast("Conectando al asistente")
         st.session_state.assistant = openai.beta.assistants.retrieve(openai_assistant)
         # Your code that might raise an error
         if "thread_id" in st.query_params:
             st.session_state.thread = client.beta.threads.retrieve(st.query_params["thread_id"])    
             st.session_state.preloadThread = True
+            st.toast("Conectado. Hilo rescatado")
         else:
             st.session_state.thread = client.beta.threads.create(
                 metadata={'session_id': st.session_state.session_id}
             )
+            st.toast("Conectado. Hilo creado")
     except Exception as e:
+        st.toast("Error")
         st.warning(f"Error: {e}")
         historial({"user":st.session_state.user_info,"thread": '',"role": 'bug', "message": "Error inicializando el asisente: {e}", "id":''})
         raise
@@ -160,20 +167,22 @@ if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "
                             run_steps = client.beta.threads.runs.steps.list(thread_id=st.session_state.thread.id,run_id=message.run_id  )
                             #st.write(run_steps.data)
                             for steps in reversed(run_steps.data):
+                                st.write(steps.step_details)
+                                
+                                
                                 if hasattr(steps.step_details, 'tool_calls'):
-                                    if len(steps.step_details.tool_calls)>0:
-                                        if hasattr(steps.step_details.tool_calls[0], 'code_interpreter'):
-                                            if len(steps.step_details.tool_calls[0].code_interpreter.input)>0:
-                                                with st.expander("Código generado por Code Interpreter"):
-                                                    #st.write(steps.step_details)
-                                                    st.code(steps.step_details.tool_calls[0].code_interpreter.input)
-                                                    if "outputs" in steps.step_details.tool_calls[0].code_interpreter:
-                                                        st.subheader("Output del código")
-                                                        st.text(steps.step_details.tool_calls[0].code_interpreter.outputs[0].logs)
-                                                
+                                    #st.write(steps.step_details.tool_calls[0].code_interpreter)
+                                    with st.expander("Código generado por Code Interpreter"):
+                                        #st.write(steps.step_details)
+                                        st.code(steps.step_details.tool_calls[0].code_interpreter.input)
+                                        if "outputs" in steps.step_details.tool_calls[0].code_interpreter:
+                                            st.subheader("Output del código")
+                                            st.text(steps.step_details.tool_calls[0].code_interpreter.outputs[0].logs)
+                                    
                     #if steps.tools[0].type == 'code_interpreter':
                         # Handle text content
                         if hasattr(content_part, 'text') and content_part.text:
+                            st.write(content_part)
                             message_text = content_part.text.value
                             pattern = r'\[.*?\]\(sandbox:.*?\)'
                             #message_text = message_text.replace("\n", "\n\n")
@@ -189,7 +198,7 @@ if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "
                                         file_id = annotation.file_path.file_id
                                         # Retrieve the image content using the file ID
                                         file_name = client.files.retrieve(file_id).filename #eg. /mnt/data/archivo.json
-                                        response = client.files.with_raw_response.retrieve_content(file_id)
+                                        response = client.files.retrieve_content(file_id)
                                         if response.status_code == 200:
                                             b64_image = base64.b64encode(response.content).decode()
                                         
@@ -223,8 +232,8 @@ if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "
                                 historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": '<img src="data:image/png;base64,'+b64_image+'">', "id": message.id})
                             else:
                                 st.error("Failed to retrieve image")
+                                
 
-                    
 
 if "chat_disabled" not in st.session_state:
     st.session_state["chat_disabled"] = False
@@ -253,15 +262,18 @@ if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state
         st.session_state.pop('file_id')
     
     st.session_state.messages = client.beta.threads.messages.create(**message_data)
-
+    st.toast("creating run")
     st.session_state.run = client.beta.threads.runs.create(
         thread_id=st.session_state.thread.id,
         assistant_id=st.session_state.assistant.id,
     )
+    st.toast("created")
     with st.chat_message('assistant'):
         st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status  in ['queued', 'in_progress'] else '', unsafe_allow_html=True)
 
     if st.session_state.retry_error < 3:
+        st.toast("Wait 2")
+        
         time.sleep(4)
         st.rerun()
 
@@ -362,6 +374,8 @@ with tab5:
 
 # Handle run status
 if hasattr(st.session_state.run, 'status'):
+    st.toast("refresh: status "+st.session_state.run.status)
+    st.toast(st.session_state.retry_error)
     if st.session_state.run.status == "failed":
         st.toast("Failed")
         st.session_state.retry_error += 1
@@ -371,21 +385,35 @@ if hasattr(st.session_state.run, 'status'):
                 st.write("Atención: " + st.session_state.run.last_error.message)
             if st.session_state.retry_error < 3:
                 st.write("Intentándolo de nuevo ......")
+                st.toast("Wait 3")
                 time.sleep(4)
                 st.rerun()
             else:
                 st.error("Lo sentimos, no se ha podido procesar: " + st.session_state.run.last_error.message)
 
     elif st.session_state.run.status != "completed":
-        st.session_state.run = client.beta.threads.runs.retrieve(
-            thread_id=st.session_state.thread.id,
-            run_id=st.session_state.run.id,
-        )
+        st.toast("entro no completed")
+        st.toast("retrieving run")
+        try:
+            st.session_state.run = client.beta.threads.runs.retrieve(
+                thread_id=st.session_state.thread.id,
+                run_id=st.session_state.run.id,
+            )
+        except Exception as e:
+            st.error(f"An error occurred retrieving list: {e}")
+            
+        st.toast("run retrieved, getting list")
         #while st.session_state.run.status == 'queued':
-        run_steps_loading = client.beta.threads.runs.steps.list(thread_id=st.session_state.thread.id,run_id=st.session_state.run.id  )
+        try:
+            run_steps_loading = client.beta.threads.runs.steps.list(thread_id=st.session_state.thread.id,run_id=st.session_state.run.id  )
+        except Exception as e:
+            st.error(f"An error occurred retrieving list: {e}")
+                    
+        st.toast("list retrieved")
         for steps_loading in reversed(run_steps_loading.data):
-            st.toast(steps_loading.step_details)
+            st.write(steps_loading.step_details)
             if hasattr(steps_loading.step_details, 'tool_calls'):
+                st.write(steps_loading.step_details)
                 if len(steps_loading.step_details.tool_calls)>0:
                     if hasattr(steps_loading.step_details.tool_calls[0], 'code_interpreter'):
                         if len(steps_loading.step_details.tool_calls[0].code_interpreter.input)>0:
@@ -395,16 +423,21 @@ if hasattr(st.session_state.run, 'status'):
                                     if "outputs" in steps_loading.step_details.tool_calls[0].code_interpreter:
                                         st.subheader("Output del código")
                                         st.text(steps_loading.step_details.tool_calls[0].code_interpreter.outputs[0].logs)
+
+
             if hasattr(steps_loading.step_details, 'message_creation'):
                 messageid = steps_loading.step_details.message_creation.message_id
                 if messageid not in st.session_state.messages_progress_ids:
+                    st.toast("getting messages")
                     message = client.beta.threads.messages.retrieve(message_id = messageid, thread_id=st.session_state.thread.id )
+                    st.toast("messages retrieved")
                     for content_part in message.content:
                         if hasattr(content_part, 'text'):
                             if len(content_part.text.value)>2:
                                 st.session_state.messages_progress.append(content_part.text.value)
                     st.toast("¡Respuesta parcial recibida!")
                     #st.write(message)
+                    
                     st.session_state.messages_progress_ids.append(messageid)
                     if len(st.session_state.messages_progress)>0:
                         with st.chat_message('assistant'):
@@ -414,9 +447,12 @@ if hasattr(st.session_state.run, 'status'):
 
                     
         if st.session_state.retry_error < 3:
+            st.toast("Main wait triggered")
+            
             time.sleep(4)
             st.rerun()
     elif st.session_state.run.status == "completed":
+        st.write("completed")
         st.toast("¡Consulta completada!")
         st.session_state.messages_progress = []
             

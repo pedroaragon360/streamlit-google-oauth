@@ -8,7 +8,8 @@ import pandas as pd
 import io
 import re
 import base64
-from openai import OpenAI
+#from openai import OpenAI
+from openai import AzureOpenAI
 import mimetypes
 import os
 
@@ -18,14 +19,18 @@ import os
 st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
 
 
+api_KEY = os.getenv('OPENAI_API_KEY_AZURE')
+api_version = os.getenv('OPENAI_API_VERSION_AZURE')
+api_endpoint = os.getenv('OPENAI_API_ENDPOINT_AZURE')
+openai_assistant = os.getenv('OPENAI_ASSISTANT_AZURE')
 
-openai_apikey = os.getenv('OPENAI_API_KEY')
-openai_assistant = os.getenv('OPENAI_ASSISTANT')
-
-#st.query_params = st.st.query_params
+# Create an OpenAI Azure client
+client = AzureOpenAI(api_key=api_KEY,
+        api_version=api_version,
+        azure_endpoint=api_endpoint)
 
 # Initialize OpenAI client
-client = OpenAI()
+# client = OpenAI()
 
 # Define state variables
 default_values = {
@@ -123,9 +128,10 @@ st.markdown('<style>[data-baseweb=tab-list] {   position: fixed !important; top:
         
 # Initialize OpenAI assistant
 if "assistant" not in st.session_state:
-    openai.api_key = openai_apikey
+    # openai.api_key = openai_apikey
+
     try:
-        st.session_state.assistant = openai.beta.assistants.retrieve(openai_assistant)
+        st.session_state.assistant = client.beta.assistants.retrieve(openai_assistant)
         # Your code that might raise an error
         if "thread_id" in st.query_params:
             st.session_state.thread = client.beta.threads.retrieve(st.query_params["thread_id"])    

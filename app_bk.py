@@ -3,7 +3,6 @@ from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 import requests
 import json  # Import the json module
-
 import openai
 import uuid
 import time

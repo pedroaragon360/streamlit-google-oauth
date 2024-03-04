@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 import json  # Import the json module
-import openai
+# import openai
 import uuid
 import time
 import pandas as pd
@@ -12,6 +12,7 @@ import base64
 from openai import AzureOpenAI
 import mimetypes
 import os
+import streamlit.components.v1 as components
 
 
 # Page config
@@ -88,7 +89,7 @@ def login_wall():
             if submitted:
                 if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
                     params = {"email": femail,"pass": fpass}
-                    st.experimental_set_st.query_params(**params)
+                    st.set_st.query_params(**params)
                     st.toast("Login " + femail + " " + fpass)
                     st.session_state.authed = 1
                     st.session_state.user_info = femail
@@ -124,7 +125,9 @@ def historial(data):
         
 # MENU
 tab1, tab2, tab3, tab4, tab5 = st.tabs([":speech_balloon: Chat", ":paperclip: Subir", "Historial", "Reportar error", "¿Preguntas?"])
-st.markdown('<style>[data-baseweb=tab-list] {   position: fixed !important; top: 0.5em;   left: 5em;   z-index: 9999999; } </style>', unsafe_allow_html=True)
+st.markdown('<style>#subir {background:white;border-radius:2em; padding:0 0.5em; font-size:1.3em;    position: absolute;z-index: 99;top: 18px;left: 50%;margin-left: -353px; }[data-baseweb=tab-list] {   position: fixed !important; top: 0.5em;   left: 5em;   z-index: 9999999; } </style>', unsafe_allow_html=True)
+#st.markdown('<button id="subir">:paperclip:</button>', unsafe_allow_html=True)
+
         
 # Initialize OpenAI assistant
 if "assistant" not in st.session_state:
@@ -330,15 +333,33 @@ if uploaded_file is not None:
        
     except Exception as e:
         st.error(f"An error occurred: {e}")
+
+
+def goToThread(thread_id):
+    # params = {"thread_id": thread_id}    st.experimental_set_st.query_params(**params)
+    st.query_params.thread_id = thread_id
+    st.session_state.thread = client.beta.threads.retrieve(st.query_params["thread_id"])    
+    st.session_state.preloadThread = True
+    st.success('Chat cargado con éxito', icon="✅")
+
                 
 # Historial
 def getThreads(data):
     st.session_state.threads = json.loads(requests.post("https://thevalley.es/lms/gpt_app/threads.php", data=data).text)
+def newThread():
+   st.session_state.thread = client.beta.threads.create(
+                metadata={'session_id': st.session_state.session_id}
+            )
 with tab3: 
     getThreads({"user":st.session_state.user_info})
     if 'threads' in st.session_state and st.session_state.threads:
+        st.button("🟢 Crear nueva conversación", on_click=newThread,  use_container_width=True)
         for fecha, thread in st.session_state.threads.items():
-            st.link_button(":speech_balloon: Conversación " + str(fecha), "https://thevalley.es/lms/gpt_app/thread_"+str(thread),  use_container_width=True)
+            #st.link_button(":speech_balloon: Conversación " + str(fecha), "https://thevalley.es/lms/gpt_app/thread_"+,  use_container_width=True)
+            st.button(":speech_balloon: Conversación " + str(fecha), on_click=goToThread, args=[str(thread)],  use_container_width=True)
+        
+        
+
 
 # Feedback
 def handle_submission(input_value):
@@ -432,3 +453,42 @@ else:
     
                             #run_steps = client.beta.threads.runs.steps.list(thread_id=st.session_state.thread.id,run_id=message.run_id  )
                             #st.write(run_steps.data)
+                            
+
+# components.html(
+#     """
+#     <script>
+#  document.addEventListener("DOMContentLoaded", function() {
+#         // Busca el elemento por ID
+#         const doc = window.parent.document;
+#         var elementToMove = doc.querySelector('#subir');
+#         // Busca el elemento objetivo por data-testid
+#         var targetElement = doc.querySelector('.ea3mdgi7');
+#         console.log('procesando')
+#         // Mueve el elementoToMove para que sea un hijo de targetElement
+#         if (elementToMove && targetElement) {
+#             console.log('movido')
+#             targetElement.appendChild(elementToMove);
+#         }
+#     });
+#     document.addEventListener('DOMContentLoaded', (event) => {
+#         const doc = window.parent.document;
+#         const uploadButton = doc.querySelector('#subir');
+        
+#         if(uploadButton) {
+#             uploadButton.addEventListener('click', function() {
+#                 console.log('El botón #subir fue clickeado');
+#                 // Aquí puedes agregar lo que quieras hacer cuando el botón sea clickeado.
+#                 // Por ejemplo, puedes intentar simular clickear otro botón o desencadenar una alerta.
+#                 // alert('El botón #subir fue clickeado');
+#                 doc.querySelector('[data-testid="stFileUploadDropzone"]').click();
+
+#             });
+#         }
+#     });
+#     </script>
+#     """,
+#     height=0,
+#     width=0,
+# )
+                            

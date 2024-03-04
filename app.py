@@ -19,7 +19,6 @@ import streamlit.components.v1 as components
 #st.set_page_config(    page_title="The Valley ChatGPT",    page_icon="",     layout="wide")
 # st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
 
-
 api_KEY = os.getenv('OPENAI_API_KEY_AZURE')
 api_version = os.getenv('OPENAI_API_VERSION_AZURE')
 api_endpoint = os.getenv('OPENAI_API_ENDPOINT_AZURE')

@@ -17,7 +17,7 @@ import streamlit.components.v1 as components
 
 # Page config
 #st.set_page_config(    page_title="The Valley ChatGPT",    page_icon="",     layout="wide")
-st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
+# st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
 
 
 api_KEY = os.getenv('OPENAI_API_KEY_AZURE')
@@ -46,14 +46,24 @@ default_values = {
     "preloadThread": False,
     "messages_progress_ids": [],
     "messages_progress": [],
-    "uploader_key": 0
+    "uploader_key": 0,
+    "loadingCounter": 0
 }
 for attr, default in default_values.items():
     if not hasattr(st.session_state, attr):
         setattr(st.session_state, attr, default)
-        
-        
 
+if(st.session_state.loadingCounter > 6):
+    st.session_state.loadingCounter = 0
+loadingTexts = [":blush: Déjame que piense...",
+                ":brain: Le estoy dando a mis neuronas...",
+                ":slightly_smiling_face: Estoy dando sentido a mis ideas...", 
+                ":writing_hand: Escribiendo la respuesta...", 
+                ":v: ¡Estoy en ello! Esto va a quedar bien", 
+                ":ok_hand: Poniendo a punto todo...",
+                ":female-technologist: Estoy dándolo todo, ¡la espera mecereá la pena!"]        
+
+loadingText = loadingTexts[st.session_state.loadingCounter]
 # Login
 def login(femail,fpass):
     if requests.post("https://thevalley.es/lms/gpt_app/login.php", data={'email': femail, 'pass': fpass}).text == "1":
@@ -126,7 +136,6 @@ def historial(data):
 # MENU
 tab1, tab2, tab3, tab4, tab5 = st.tabs([":speech_balloon: Chat", ":paperclip: Subir", "Historial", "Reportar error", "¿Preguntas?"])
 st.markdown('<style>#subir {background:white;border-radius:2em; padding:0 0.5em; font-size:1.3em;    position: absolute;z-index: 99;top: 18px;left: 50%;margin-left: -353px; }[data-baseweb=tab-list] {   position: fixed !important; top: 0.5em;   left: 5em;   z-index: 9999999; } </style>', unsafe_allow_html=True)
-#st.markdown('<button id="subir">:paperclip:</button>', unsafe_allow_html=True)
 
         
 # Initialize OpenAI assistant
@@ -268,7 +277,7 @@ if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state
         assistant_id=st.session_state.assistant.id,
     )
     with st.chat_message('assistant'):
-        st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status  in ['queued', 'in_progress'] else '', unsafe_allow_html=True)
+        st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> '+loadingText if st.session_state.run.status  in ['queued', 'in_progress'] else '', unsafe_allow_html=True)
 
     if st.session_state.retry_error < 3:
         time.sleep(4)
@@ -411,7 +420,7 @@ if hasattr(st.session_state.run, 'status'):
         #while st.session_state.run.status == 'queued':
         run_steps_loading = client.beta.threads.runs.steps.list(thread_id=st.session_state.thread.id,run_id=st.session_state.run.id  )
         for steps_loading in reversed(run_steps_loading.data):
-            st.toast(steps_loading.step_details)
+            # st.toast(steps_loading.step_details)
             if hasattr(steps_loading.step_details, 'tool_calls'):
                 if len(steps_loading.step_details.tool_calls)>0:
                     if hasattr(steps_loading.step_details.tool_calls[0], 'code_interpreter'):
@@ -424,20 +433,20 @@ if hasattr(st.session_state.run, 'status'):
                                         st.text(steps_loading.step_details.tool_calls[0].code_interpreter.outputs[0].logs)
             if hasattr(steps_loading.step_details, 'message_creation'):
                 messageid = steps_loading.step_details.message_creation.message_id
-                if messageid not in st.session_state.messages_progress_ids:
-                    message = client.beta.threads.messages.retrieve(message_id = messageid, thread_id=st.session_state.thread.id )
-                    for content_part in message.content:
-                        if hasattr(content_part, 'text'):
-                            if len(content_part.text.value)>2:
-                                st.session_state.messages_progress.append(content_part.text.value)
-                    st.toast("¡Respuesta parcial recibida!")
-                    #st.write(message)
-                    st.session_state.messages_progress_ids.append(messageid)
+                # if messageid not in st.session_state.messages_progress_ids:
+                message = client.beta.threads.messages.retrieve(message_id = messageid, thread_id=st.session_state.thread.id )
+                for content_part in message.content:
+                    if hasattr(content_part, 'text'):
+                        if len(content_part.text.value)>20:
+                            st.session_state.messages_progress.append(content_part.text.value)
+                            st.session_state.messages_progress_ids.append(messageid)
+                            st.toast("¡Respuesta parcial recibida!")
+                with st.chat_message('assistant'):
                     if len(st.session_state.messages_progress)>0:
-                        with st.chat_message('assistant'):
                             for message in st.session_state.messages_progress:
                                 st.write(message)
-                            st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> Pensando...' if st.session_state.run.status in ['queued', 'in_progress'] else '', unsafe_allow_html=True)
+                    st.write('<img src="https://thevalley.es/lms/i/load.gif" height="28px"> '+ loadingText if st.session_state.run.status in ['queued', 'in_progress'] else '', unsafe_allow_html=True)
+                    st.session_state.loadingCounter = st.session_state.loadingCounter+1
 
                     
         if st.session_state.retry_error < 3:
@@ -446,6 +455,8 @@ if hasattr(st.session_state.run, 'status'):
     elif st.session_state.run.status == "completed":
         st.toast("¡Consulta completada!")
         st.session_state.messages_progress = []
+        st.session_state.loadingCounter = 0
+
             
 else:
     st.toast("No more status")

@@ -19,32 +19,37 @@ import streamlit.components.v1 as components
 #st.set_page_config(    page_title="The Valley ChatGPT",    page_icon="",     layout="wide")
 # st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
 
-if 'service' in st.query_params:
-    if st.query_params.service == 'azure':
-        api_KEY = os.getenv('OPENAI_API_KEY_AZURE')
-        api_version = os.getenv('OPENAI_API_VERSION_AZURE')
-        api_endpoint = os.getenv('OPENAI_API_ENDPOINT_AZURE')
-        openai_assistant = os.getenv('OPENAI_ASSISTANT_AZURE')
-        openai_assistant_full = os.getenv('OPENAI_ASSISTANT_FULL_AZURE')
-        client = AzureOpenAI(api_key=api_KEY,
-                api_version=api_version,
-                azure_endpoint=api_endpoint)
-        infoAssistant = ' Modelo: Azure OpenAI GPT-4 Code interpreter'
-    else:
-        api_KEY = os.getenv('OPENAI_API_KEY_AZURE')
-        api_version = os.getenv('OPENAI_API_VERSION_AZURE')
-        api_endpoint = os.getenv('OPENAI_API_ENDPOINT_AZURE')
-        openai_assistant = os.getenv('OPENAI_ASSISTANT_AZURE_BASIC')
-        openai_assistant_full = os.getenv('OPENAI_ASSISTANT_FULL_AZURE')
-        client = AzureOpenAI(api_key=api_KEY,
-                api_version=api_version,
-                azure_endpoint=api_endpoint)
-        infoAssistant = ' Modelo: Azure OpenAI GPT Turbo (Sin archivos ni código)'
+if 'service' not in st.query_params:
+    model_instance = 'default'
+    st.query_params.service = 'default'
 else:
+    model_instance = st.query_params.service
+
+if 'switch' in st.query_params:
+    model_instance = 'fast'
+
+if model_instance == 'default':
     openai_apikey = os.getenv('OPENAI_API_KEY')
     openai_assistant = os.getenv('OPENAI_ASSISTANT')
     client = OpenAI()
     infoAssistant = ' Modelo: OpenAI GPT-4'
+elif model_instance == 'azure':
+    api_KEY = os.getenv('OPENAI_API_KEY_AZURE')
+    api_version = os.getenv('OPENAI_API_VERSION_AZURE')
+    api_endpoint = os.getenv('OPENAI_API_ENDPOINT_AZURE')
+    openai_assistant = os.getenv('OPENAI_ASSISTANT_AZURE')
+    openai_assistant_full = os.getenv('OPENAI_ASSISTANT_FULL_AZURE')
+    client = AzureOpenAI(api_key=api_KEY, api_version=api_version, azure_endpoint=api_endpoint)
+    infoAssistant = ' Modelo: Azure OpenAI GPT-4 Code interpreter'
+else:
+    model_instance = 'fast'
+    api_KEY = os.getenv('OPENAI_API_KEY_AZURE')
+    api_version = os.getenv('OPENAI_API_VERSION_AZURE')
+    api_endpoint = os.getenv('OPENAI_API_ENDPOINT_AZURE')
+    openai_assistant = os.getenv('OPENAI_ASSISTANT_AZURE_BASIC')
+    openai_assistant_full = os.getenv('OPENAI_ASSISTANT_FULL_AZURE')
+    client = AzureOpenAI(api_key=api_KEY, api_version=api_version, azure_endpoint=api_endpoint)
+    infoAssistant = ' Modelo: Azure OpenAI GPT Turbo (Sin archivos ni código)'
 
 
 # Initialize OpenAI client
@@ -78,7 +83,7 @@ loadingTexts = [":blush: Déjame que piense...",
                 ":writing_hand: Escribiendo la respuesta...", 
                 ":v: ¡Estoy en ello! Esto va a quedar bien", 
                 ":ok_hand: Poniendo a punto todo...",
-                ":female-technologist: Estoy dándolo todo, ¡la espera mecereá la pena!"]        
+                ":female-technologist: Estoy dándolo todo, ¡la espera merecerá la pena!"]        
 
 loadingText = loadingTexts[st.session_state.loadingCounter]
 # Login
@@ -144,10 +149,10 @@ if "authed" not in st.session_state:
 
 # Functions
 def historial(data):    
-    if data["id"] not in st.session_state.savedMessages:
+    if data["role"] == 'user' or data["id"] not in st.session_state.savedMessages:
         if data["role"] == 'assistant':
             st.session_state["chat_disabled"] = False
-        st.session_state.savedMessages.append(data["id"])
+            st.session_state.savedMessages.append(data["id"])
         response = requests.post("https://thevalley.es/lms/gpt_app/historial.php", data=data)
         
 # MENU
@@ -171,13 +176,16 @@ if "assistant" not in st.session_state:
             )
     except Exception as e:
         st.warning(f"Error: {e}")
-        historial({"user":st.session_state.user_info,"thread": '',"role": 'bug', "message": "Error inicializando el asisente: {e}", "id":''})
+        historial({"user":st.session_state.user_info,"model_instance": model_instance, "thread": '',"role": 'bug', "message": "Error inicializando el asisente: {e}", "id":''})
         raise
 
 # Chat Tab
 with tab1:
     with st.chat_message('assistant'):
-        st.caption('Esta aplicación está disponible para uso educativo, úsalo con responsabilidad. Tu actividad queda guardada en "Historial".' + infoAssistant)
+        if model_instance == 'fast':
+            st.markdown("<a href='?email="+st.query_params.email+"&pass=encoded&service=" + st.query_params.service+"' target ='_self'><button style='width:100%; background: rgba(61, 213, 109, 0.2); border:0; padding: 0.5em 1em'>✅ Modo Turbo activado.  <u>Volver a modo Normal</u></button></a>", unsafe_allow_html=True)
+        st.caption('Esta aplicación está disponible para uso educativo, úsalo con responsabilidad. Tu actividad queda guardada en "Historial".' + infoAssistant)        
+        
         st.write('¡Hola! Soy el asistente GPT de The Valley. ¿cómo te puedo ayudar?')
 
 # Display chat messages
@@ -193,7 +201,6 @@ if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "
                     for content_part in message.content:
                         if message.role == 'assistant':
                             run_steps = client.beta.threads.runs.steps.list(thread_id=st.session_state.thread.id,run_id=message.run_id  )
-                            #st.write(run_steps.data)
                             for steps in reversed(run_steps.data):
                                 if hasattr(steps.step_details, 'tool_calls'):
                                     if len(steps.step_details.tool_calls)>0:
@@ -214,7 +221,8 @@ if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "
                             #message_text = message_text.replace("\n", "\n\n")
                             message_text = re.sub(pattern, '', message_text)
                             st.markdown(message_text)
-                            historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": message_text, "id": message.id})
+                            if message.role == 'assistant':
+                                historial({"user":st.session_state.user_info,"model_instance": model_instance,"thread":st.session_state.thread.id,"role": message.role, "message": message_text, "id": message.id})
                             #st.write("Msg:", message)
     
                             # Check for and display image from annotations
@@ -239,7 +247,7 @@ if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "
                                             # Create a download button with the correct MIME type and filename
                                             href = f'<a style="border: 1px solid white;background: white; color: black; padding: 0.4em 0.8em; border-radius: 1em;" href="data:{mime_type};base64,{b64_image}" download="{filename}">Descargar {filename}</a>'
                                             st.markdown(href, unsafe_allow_html=True)
-                                            historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": href, "id": message.id})
+                                            historial({"user":st.session_state.user_info,"model_instance": model_instance,"thread":st.session_state.thread.id,"role": message.role, "message": href, "id": message.id})
                                         else:
                                             st.error("Failed to retrieve file")
                                         
@@ -255,11 +263,12 @@ if (hasattr(st.session_state.run, 'status') and st.session_state.run.status == "
                             if response.status_code == 200:
                                 st.image(response.content)
                                 b64_image = base64.b64encode(response.content).decode()
-                                historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": message.role, "message": '<img src="data:image/png;base64,'+b64_image+'">', "id": message.id})
+                                historial({"user":st.session_state.user_info,"model_instance": model_instance,"thread":st.session_state.thread.id,"role": message.role, "message": '<img src="data:image/png;base64,'+b64_image+'">', "id": message.id})
                             else:
                                 st.error("Failed to retrieve image")
 
                     
+        
 
 if "chat_disabled" not in st.session_state:
     st.session_state["chat_disabled"] = False
@@ -278,6 +287,7 @@ if prompt := st.chat_input("¿Cómo te puedo ayudar?", disabled=st.session_state
         "role": "user",
         "content": prompt_raw
     }
+    historial({"user":st.session_state.user_info,"model_instance": model_instance,"thread":st.session_state.thread.id,"role": 'user', "message": prompt_raw})
     with tab1:
         with st.chat_message('user'):
             st.markdown(prompt)
@@ -338,7 +348,7 @@ if uploaded_file is not None:
         
         with tab2:
             st.success(f"Archivo subido. File ID: {file_response.id}")
-        historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": 'user', "message": f"Archivo subido: {uploaded_file.name} ID: {file_response.id}", "id": file_response.id})
+        historial({"user":st.session_state.user_info,"model_instance": model_instance,"thread":st.session_state.thread.id,"role": 'user', "message": f"Archivo subido: {uploaded_file.name} ID: {file_response.id}", "id": file_response.id})
         # Determine MIME type
         mime_type, _ = mimetypes.guess_type(uploaded_file.name)
         
@@ -368,7 +378,6 @@ def goToThread(thread_id):
     st.session_state.preloadThread = True
     st.success('Chat cargado con éxito', icon="✅")
 
-                
 # Historial
 def getThreads(data):
     st.session_state.threads = json.loads(requests.post("https://thevalley.es/lms/gpt_app/threads.php", data=data).text)
@@ -377,7 +386,7 @@ def newThread():
                 metadata={'session_id': st.session_state.session_id}
             )
 with tab3: 
-    getThreads({"user":st.session_state.user_info})
+    getThreads({"user":st.session_state.user_info,"model_instance":model_instance})
     if 'threads' in st.session_state and st.session_state.threads:
         st.button("🟢 Crear nueva conversación", on_click=newThread,  use_container_width=True)
         for fecha, thread in st.session_state.threads.items():
@@ -390,11 +399,11 @@ with tab3:
 # Feedback
 
 def handle_submission(input_value):
-    historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": 'bug', "message": input_value, "id": input_value})
+    historial({"user":st.session_state.user_info,"model_instance": model_instance,"thread":st.session_state.thread.id,"role": 'bug', "message": input_value, "id": input_value})
     st.success("¡Gracias! Feedback enviado")
 with tab4:
     st.title("¿Algún problema? Envíanos tu feedback")
-    st.markdown("<a href='?email="+st.query_params.email+"&pass=encoded&service=basic' target ='_self'><button style='width:100%; border-radius:1em'>🟢 Accede al modo Turbo (sin subida de archivos)</button></a>", unsafe_allow_html=True)
+    st.markdown("<a href='?email="+st.query_params.email+"&pass=encoded&service=" + st.query_params.service+"&switch=true' target ='_self'><button style='width:100%; border-radius:1em'>🟢 Accede al modo Turbo (sin subida de archivos)</button></a>", unsafe_allow_html=True)
     input_text = st.text_input("¿Qué problema has tenido en esta conversación?")
     submit_button = st.button("Dar feedback >")
     if submit_button:

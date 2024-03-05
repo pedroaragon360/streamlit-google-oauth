@@ -9,7 +9,7 @@ import io
 import re
 import base64
 #from openai import OpenAI
-from openai import AzureOpenAI
+from openai import AzureOpenAI, OpenAI
 import mimetypes
 import os
 import streamlit.components.v1 as components
@@ -19,16 +19,20 @@ import streamlit.components.v1 as components
 #st.set_page_config(    page_title="The Valley ChatGPT",    page_icon="",     layout="wide")
 # st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
 
-api_KEY = os.getenv('OPENAI_API_KEY_AZURE')
-api_version = os.getenv('OPENAI_API_VERSION_AZURE')
-api_endpoint = os.getenv('OPENAI_API_ENDPOINT_AZURE')
-openai_assistant = os.getenv('OPENAI_ASSISTANT_AZURE')
-openai_assistant_full = os.getenv('OPENAI_ASSISTANT_FULL_AZURE')
+if 'service' in st.query_params:
+    api_KEY = os.getenv('OPENAI_API_KEY_AZURE')
+    api_version = os.getenv('OPENAI_API_VERSION_AZURE')
+    api_endpoint = os.getenv('OPENAI_API_ENDPOINT_AZURE')
+    openai_assistant = os.getenv('OPENAI_ASSISTANT_AZURE')
+    openai_assistant_full = os.getenv('OPENAI_ASSISTANT_FULL_AZURE')
+    client = AzureOpenAI(api_key=api_KEY,
+            api_version=api_version,
+            azure_endpoint=api_endpoint)
+else:
+    openai_apikey = os.getenv('OPENAI_API_KEY')
+    openai_assistant = os.getenv('OPENAI_ASSISTANT')
+    client = OpenAI()
 
-# Create an OpenAI Azure client
-client = AzureOpenAI(api_key=api_KEY,
-        api_version=api_version,
-        azure_endpoint=api_endpoint)
 
 # Initialize OpenAI client
 # client = OpenAI()

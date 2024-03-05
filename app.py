@@ -23,6 +23,7 @@ api_KEY = os.getenv('OPENAI_API_KEY_AZURE')
 api_version = os.getenv('OPENAI_API_VERSION_AZURE')
 api_endpoint = os.getenv('OPENAI_API_ENDPOINT_AZURE')
 openai_assistant = os.getenv('OPENAI_ASSISTANT_AZURE')
+openai_assistant_full = os.getenv('OPENAI_ASSISTANT_FULL_AZURE')
 
 # Create an OpenAI Azure client
 client = AzureOpenAI(api_key=api_KEY,
@@ -436,10 +437,11 @@ if hasattr(st.session_state.run, 'status'):
                 message = client.beta.threads.messages.retrieve(message_id = messageid, thread_id=st.session_state.thread.id )
                 for content_part in message.content:
                     if hasattr(content_part, 'text'):
-                        if len(content_part.text.value)>20:
-                            st.session_state.messages_progress.append(content_part.text.value)
-                            st.session_state.messages_progress_ids.append(messageid)
-                            st.toast("¡Respuesta parcial recibida!")
+                        if messageid not in st.session_state.messages_progress_ids:
+                            if len(content_part.text.value)>20:
+                                st.session_state.messages_progress.append(content_part.text.value)
+                                st.session_state.messages_progress_ids.append(messageid)
+                                st.toast("¡Respuesta parcial recibida!")
                 with st.chat_message('assistant'):
                     if len(st.session_state.messages_progress)>0:
                             for message in st.session_state.messages_progress:

@@ -20,18 +20,31 @@ import streamlit.components.v1 as components
 # st.markdown('<style> [data-testid=stToolbar]{ top:-10em } </style>', unsafe_allow_html=True)
 
 if 'service' in st.query_params:
-    api_KEY = os.getenv('OPENAI_API_KEY_AZURE')
-    api_version = os.getenv('OPENAI_API_VERSION_AZURE')
-    api_endpoint = os.getenv('OPENAI_API_ENDPOINT_AZURE')
-    openai_assistant = os.getenv('OPENAI_ASSISTANT_AZURE')
-    openai_assistant_full = os.getenv('OPENAI_ASSISTANT_FULL_AZURE')
-    client = AzureOpenAI(api_key=api_KEY,
-            api_version=api_version,
-            azure_endpoint=api_endpoint)
+    if st.query_params.service == 'azure':
+        api_KEY = os.getenv('OPENAI_API_KEY_AZURE')
+        api_version = os.getenv('OPENAI_API_VERSION_AZURE')
+        api_endpoint = os.getenv('OPENAI_API_ENDPOINT_AZURE')
+        openai_assistant = os.getenv('OPENAI_ASSISTANT_AZURE')
+        openai_assistant_full = os.getenv('OPENAI_ASSISTANT_FULL_AZURE')
+        client = AzureOpenAI(api_key=api_KEY,
+                api_version=api_version,
+                azure_endpoint=api_endpoint)
+        infoAssistant = ' Modelo: Azure OpenAI GPT-4 Code interpreter'
+    else:
+        api_KEY = os.getenv('OPENAI_API_KEY_AZURE')
+        api_version = os.getenv('OPENAI_API_VERSION_AZURE')
+        api_endpoint = os.getenv('OPENAI_API_ENDPOINT_AZURE')
+        openai_assistant = os.getenv('OPENAI_ASSISTANT_AZURE_BASIC')
+        openai_assistant_full = os.getenv('OPENAI_ASSISTANT_FULL_AZURE')
+        client = AzureOpenAI(api_key=api_KEY,
+                api_version=api_version,
+                azure_endpoint=api_endpoint)
+        infoAssistant = ' Modelo: Azure OpenAI GPT Turbo (Sin archivos ni código)'
 else:
     openai_apikey = os.getenv('OPENAI_API_KEY')
     openai_assistant = os.getenv('OPENAI_ASSISTANT')
     client = OpenAI()
+    infoAssistant = ' Modelo: OpenAI GPT-4'
 
 
 # Initialize OpenAI client
@@ -164,7 +177,7 @@ if "assistant" not in st.session_state:
 # Chat Tab
 with tab1:
     with st.chat_message('assistant'):
-        st.caption('Esta aplicación está disponible para uso educativo, úsalo con responsabilidad. Tu actividad queda guardada en "Historial".')
+        st.caption('Esta aplicación está disponible para uso educativo, úsalo con responsabilidad. Tu actividad queda guardada en "Historial".' + infoAssistant)
         st.write('¡Hola! Soy el asistente GPT de The Valley. ¿cómo te puedo ayudar?')
 
 # Display chat messages
@@ -375,11 +388,13 @@ with tab3:
 
 
 # Feedback
+
 def handle_submission(input_value):
     historial({"user":st.session_state.user_info,"thread":st.session_state.thread.id,"role": 'bug', "message": input_value, "id": input_value})
     st.success("¡Gracias! Feedback enviado")
 with tab4:
     st.title("¿Algún problema? Envíanos tu feedback")
+    st.markdown("<a href='?email="+st.query_params.email+"&pass=encoded&service=basic' target ='_self'><button style='width:100%; border-radius:1em'>🟢 Accede al modo Turbo (sin subida de archivos)</button></a>", unsafe_allow_html=True)
     input_text = st.text_input("¿Qué problema has tenido en esta conversación?")
     submit_button = st.button("Dar feedback >")
     if submit_button:
